@@ -1,48 +1,37 @@
-# ecs-clusters-container-insights
+# ECS clusters have Container Insights enabled
 
-## Policy Description
-This policy requires that resources of type `awscc_ecs_cluster` have Container Insights enabled.
+| Provider            | Category |
+|---------------------|----------|
+| Amazon Web Services | Monitoring |
 
-## Policy Requirements
-This policy requires that ECS clusters have Container Insights enabled through the `cluster_settings` configuration.
+## Foundational Security Best practices covered with this policy
 
-## AWS Foundational Security Best Practices
-This policy relates to the AWS Foundational Security Best Practice control [ECS.1](https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-1).
+| Version | Included |
+|---------|----------|
+| [ECS.1](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-1)   | &check;  |
 
 ## Policy Result (Pass)
 ```
-PASS - policies/ecs/ecs-clusters-container-insights.sentinel
-  PASS - policies/ecs/test/ecs-clusters-container-insights/success.hcl
-
-    trace:
-      ecs-clusters-container-insights.sentinel:67:1 - Rule "main"
-        Value:
-          true
+→ → Overall Result: true
 ```
 
 ## Policy Result (Fail)
 ```
-FAIL - policies/ecs/ecs-clusters-container-insights.sentinel
-  FAIL - policies/ecs/test/ecs-clusters-container-insights/failure.hcl
+→ → Overall Result: false
 
-
-    logs:
-      ECS clusters without Container Insights enabled:
-        * awscc_ecs_cluster.cluster_without_insights
-        * awscc_ecs_cluster.cluster_with_disabled_insights
-    trace:
-      ecs-clusters-container-insights.sentinel:67:1 - Rule "main"
-        Value:
-          false
+ECS clusters without Container Insights enabled:
+  * awscc_ecs_cluster.cluster_without_insights
+  * awscc_ecs_cluster.cluster_with_disabled_insights
 ```
 
 ## Remediation
-To remediate this issue, ensure that Container Insights is enabled for your ECS clusters:
+To remediate this issue, ensure that Container Insights is enabled for all ECS clusters:
 
 ```hcl
 resource "awscc_ecs_cluster" "example" {
-  cluster_name = "my-cluster"
+  cluster_name = "example-cluster"
   
+  # Enable Container Insights
   cluster_settings {
     name  = "containerInsights"
     value = "enabled"
@@ -51,5 +40,6 @@ resource "awscc_ecs_cluster" "example" {
 ```
 
 ## Resources
-- [AWS ECS Container Insights Documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-container-insights.html)
-- [AWS Foundational Security Best Practices - ECS.1](https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-1)
+- [Amazon ECS Documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_clusters.html)
+- [Amazon ECS CloudWatch Container Insights](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-container-insights.html)
+- [AWS Foundational Security Best Practices - ECS.1](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-1)

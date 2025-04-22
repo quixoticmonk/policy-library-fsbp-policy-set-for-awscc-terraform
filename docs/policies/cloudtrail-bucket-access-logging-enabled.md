@@ -1,13 +1,14 @@
-# cloudtrail-bucket-access-logging-enabled
+# CloudTrail S3 buckets have access logging enabled
 
-## Policy Description
-This policy requires that resources of type `awscc_cloudtrail_trail` have bucket access logging enabled.
+| Provider            | Category |
+|---------------------|----------|
+| Amazon Web Services | Security |
 
-## Policy Requirements
-This policy requires that CloudTrail S3 buckets have access logging enabled.
+## Foundational Security Best practices covered with this policy
 
-## AWS Foundational Security Best Practices
-This policy relates to the AWS Foundational Security Best Practice control [CloudTrail.7](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-7).
+| Version | Included |
+|---------|----------|
+| [CloudTrail.7](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-7)   | &check;  |
 
 ## Policy Result (Pass)
 ```

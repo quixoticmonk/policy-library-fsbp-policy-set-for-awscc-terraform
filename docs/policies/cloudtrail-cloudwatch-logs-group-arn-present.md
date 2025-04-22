@@ -1,13 +1,14 @@
-# cloudtrail-cloudwatch-logs-group-arn-present
+# CloudTrail trails have CloudWatch logs enabled
 
-## Policy Description
-This policy requires that resources of type `awscc_cloudtrail_trail` have CloudWatch Logs group ARN configured.
+| Provider            | Category |
+|---------------------|----------|
+| Amazon Web Services | Security |
 
-## Policy Requirements
-This policy requires that CloudTrail trails are configured to send logs to CloudWatch Logs for monitoring.
+## Foundational Security Best practices covered with this policy
 
-## AWS Foundational Security Best Practices
-This policy relates to the AWS Foundational Security Best Practice control [CloudTrail.4](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-4).
+| Version | Included |
+|---------|----------|
+| [CloudTrail.4](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-4)   | &check;  |
 
 ## Policy Result (Pass)
 ```
@@ -33,11 +34,11 @@ Found 1 resource violations
 ```
 
 ## Remediation
-To remediate this issue, ensure that CloudTrail trails are configured to send logs to CloudWatch Logs:
+To remediate this issue, ensure that CloudWatch logs are enabled for CloudTrail trails:
 
 ```hcl
 resource "awscc_cloudwatch_log_group" "cloudtrail_logs" {
-  log_group_name = "CloudTrail/Logs"
+  log_group_name = "CloudTrail/logs"
   retention_in_days = 90
 }
 
@@ -61,10 +62,10 @@ resource "awscc_iam_role" "cloudtrail_cloudwatch_role" {
 resource "awscc_cloudtrail_trail" "example" {
   name = "example-trail"
   s3_bucket_name = awscc_s3_bucket.cloudtrail_bucket.bucket
+  
+  # Enable CloudWatch logs
   cloud_watch_logs_group_arn = awscc_cloudwatch_log_group.cloudtrail_logs.arn
   cloud_watch_logs_role_arn = awscc_iam_role.cloudtrail_cloudwatch_role.arn
-  is_multi_region_trail = true
-  include_global_service_events = true
 }
 ```
 

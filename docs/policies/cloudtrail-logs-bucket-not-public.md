@@ -1,13 +1,14 @@
-# cloudtrail-logs-bucket-not-public
+# CloudTrail S3 buckets are not publicly accessible
 
-## Policy Description
-This policy requires that S3 buckets used to store CloudTrail logs are not publicly accessible.
+| Provider            | Category |
+|---------------------|----------|
+| Amazon Web Services | Security |
 
-## Policy Requirements
-This policy requires that CloudTrail S3 buckets have appropriate access controls to prevent public access.
+## Foundational Security Best practices covered with this policy
 
-## AWS Foundational Security Best Practices
-This policy relates to the AWS Foundational Security Best Practice control [CloudTrail.6](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-6).
+| Version | Included |
+|---------|----------|
+| [CloudTrail.6](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-6)   | &check;  |
 
 ## Policy Result (Pass)
 ```
@@ -38,48 +39,27 @@ To remediate this issue, ensure that the S3 bucket used for CloudTrail logs is n
 ```hcl
 resource "awscc_s3_bucket" "cloudtrail_bucket" {
   bucket = "example-cloudtrail-logs"
+  # Do not set public ACL
 }
 
-resource "awscc_s3_bucket_public_access_block" "cloudtrail_bucket_block" {
+resource "awscc_s3_bucket_public_access_block" "cloudtrail_bucket" {
   bucket = awscc_s3_bucket.cloudtrail_bucket.bucket
   
+  # Block all public access
   block_public_acls = true
-  block_public_policy = true
   ignore_public_acls = true
+  block_public_policy = true
   restrict_public_buckets = true
 }
 
-resource "awscc_s3_bucket_policy" "cloudtrail_bucket_policy" {
+resource "awscc_s3_bucket_acl" "cloudtrail_bucket" {
   bucket = awscc_s3_bucket.cloudtrail_bucket.bucket
-  
-  policy_document = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid = "AWSCloudTrailAclCheck"
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudtrail.amazonaws.com"
-        }
-        Action = "s3:GetBucketAcl"
-        Resource = "arn:aws:s3:::${awscc_s3_bucket.cloudtrail_bucket.bucket}"
-      },
-      {
-        Sid = "AWSCloudTrailWrite"
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudtrail.amazonaws.com"
-        }
-        Action = "s3:PutObject"
-        Resource = "arn:aws:s3:::${awscc_s3_bucket.cloudtrail_bucket.bucket}/AWSLogs/*"
-        Condition = {
-          StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
-          }
-        }
-      }
-    ]
-  })
+  acl = "private"
+}
+
+resource "awscc_cloudtrail_trail" "example" {
+  name = "example-trail"
+  s3_bucket_name = awscc_s3_bucket.cloudtrail_bucket.bucket
 }
 ```
 

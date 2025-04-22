@@ -1,4 +1,4 @@
-# ECS Fargate services use the latest platform version
+# ECS services do not have public IP addresses automatically assigned
 
 | Provider            | Category |
 |---------------------|----------|
@@ -8,7 +8,7 @@
 
 | Version | Included |
 |---------|----------|
-| [ECS.3](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-3)   | &check;  |
+| [ECS.4](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-4)   | &check;  |
 
 ## Policy Result (Pass)
 ```
@@ -19,12 +19,12 @@
 ```
 → → Overall Result: false
 
-ECS Fargate services not running on the latest platform version:
-  * awscc_ecs_service.fargate_service_old_version
+ECS services with public IP addresses assigned automatically:
+  * awscc_ecs_service.service_with_public_ip
 ```
 
 ## Remediation
-To remediate this issue, ensure that all ECS Fargate services use the latest platform version:
+To remediate this issue, ensure that ECS services do not automatically assign public IP addresses:
 
 ```hcl
 resource "awscc_ecs_service" "example" {
@@ -32,18 +32,16 @@ resource "awscc_ecs_service" "example" {
   cluster       = awscc_ecs_cluster.example.arn
   desired_count = 2
   
-  # Use Fargate launch type
   launch_type = "FARGATE"
-  
-  # Use the latest platform version
-  platform_version = "LATEST"
-  
   task_definition = awscc_ecs_task_definition.example.arn
   
   network_configuration {
     awsvpc_configuration {
-      subnets = [awscc_subnet.example.id]
+      subnets = [awscc_subnet.private.id]
       security_groups = [awscc_security_group.example.id]
+      
+      # Do not assign public IP addresses
+      assign_public_ip = false
     }
   }
 }
@@ -51,5 +49,5 @@ resource "awscc_ecs_service" "example" {
 
 ## Resources
 - [Amazon ECS Documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_services.html)
-- [AWS Fargate Platform Versions](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html)
-- [AWS Foundational Security Best Practices - ECS.3](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-3)
+- [ECS Task Networking](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
+- [AWS Foundational Security Best Practices - ECS.4](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-4)

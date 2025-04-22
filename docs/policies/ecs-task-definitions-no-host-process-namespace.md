@@ -1,63 +1,49 @@
-# ecs-task-definitions-no-host-process-namespace
+# ECS task definitions do not share the host's process namespace
 
-## Policy Description
-This policy requires that resources of type `awscc_ecs_task_definition` do not share the host's process namespace.
+| Provider            | Category |
+|---------------------|----------|
+| Amazon Web Services | Security |
 
-## Policy Requirements
-This policy requires that ECS task definitions do not use the host's process namespace by setting `pid_mode` to `"host"`.
+## Foundational Security Best practices covered with this policy
 
-## AWS Foundational Security Best Practices
-This policy relates to the AWS Foundational Security Best Practice control [ECS.3](https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-3).
+| Version | Included |
+|---------|----------|
+| [ECS.8](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-8)   | &check;  |
 
 ## Policy Result (Pass)
 ```
-PASS - policies/ecs/ecs-task-definitions-no-host-process-namespace.sentinel
-  PASS - policies/ecs/test/ecs-task-definitions-no-host-process-namespace/success.hcl
-
-    trace:
-      ecs-task-definitions-no-host-process-namespace.sentinel:50:1 - Rule "main"
-        Value:
-          true
+→ → Overall Result: true
 ```
 
 ## Policy Result (Fail)
 ```
-FAIL - policies/ecs/ecs-task-definitions-no-host-process-namespace.sentinel
-  FAIL - policies/ecs/test/ecs-task-definitions-no-host-process-namespace/failure.hcl
+→ → Overall Result: false
 
-
-    logs:
-      ECS task definitions that share the host's process namespace:
-        * awscc_ecs_task_definition.task_def_with_host_pid
-    trace:
-      ecs-task-definitions-no-host-process-namespace.sentinel:50:1 - Rule "main"
-        Value:
-          false
+ECS task definitions that share the host's process namespace:
+  * awscc_ecs_task_definition.task_def_with_host_pid
 ```
 
 ## Remediation
-To remediate this issue, ensure that your ECS task definitions do not use the host's process namespace:
+To remediate this issue, ensure that ECS task definitions do not use the host's process namespace:
 
 ```hcl
 resource "awscc_ecs_task_definition" "example" {
-  family = "my-task-family"
+  family = "example-task-definition"
   
-  # Use "task" instead of "host" for pid_mode
-  pid_mode = "task"
+  # Do not set pid_mode to "host"
+  # pid_mode = "host"  # This would be a violation
   
-  container_definitions = [
+  container_definitions = jsonencode([
     {
-      name      = "my-container"
+      name      = "example-container"
       image     = "nginx:latest"
       essential = true
-      user      = "nginx"
     }
-  ]
+  ])
 }
 ```
 
-Alternatively, you can omit the `pid_mode` parameter entirely, as it defaults to a non-host value.
-
 ## Resources
-- [AWS ECS Task Definition Parameters](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html)
-- [AWS Foundational Security Best Practices - ECS.3](https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-3)
+- [Amazon ECS Documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html)
+- [ECS Task Definition Parameters - PID Mode](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_definition_pidmode)
+- [AWS Foundational Security Best Practices - ECS.8](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecs-8)

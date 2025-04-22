@@ -1,13 +1,14 @@
-# cloudtrail-server-side-encryption-enabled
+# CloudTrail trails are encrypted using KMS CMKs
 
-## Policy Description
-This policy requires that resources of type `awscc_cloudtrail_trail` have server-side encryption enabled using KMS.
+| Provider            | Category |
+|---------------------|----------|
+| Amazon Web Services | Security |
 
-## Policy Requirements
-This policy requires that CloudTrail trails are configured with server-side encryption using a KMS key.
+## Foundational Security Best practices covered with this policy
 
-## AWS Foundational Security Best Practices
-This policy relates to the AWS Foundational Security Best Practice control [CloudTrail.2](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-2).
+| Version | Included |
+|---------|----------|
+| [CloudTrail.2](https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-2)   | &check;  |
 
 ## Policy Result (Pass)
 ```
@@ -33,13 +34,12 @@ Found 1 resource violations
 ```
 
 ## Remediation
-To remediate this issue, ensure that CloudTrail trails are configured with server-side encryption using a KMS key:
+To remediate this issue, ensure that CloudTrail trails are encrypted using KMS CMKs:
 
 ```hcl
 resource "awscc_kms_key" "cloudtrail_key" {
   description = "KMS key for CloudTrail encryption"
-  enable_key_rotation = true
-  policy = jsonencode({
+  key_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
@@ -70,9 +70,9 @@ resource "awscc_kms_key" "cloudtrail_key" {
 resource "awscc_cloudtrail_trail" "example" {
   name = "example-trail"
   s3_bucket_name = awscc_s3_bucket.cloudtrail_bucket.bucket
+  
+  # Enable KMS encryption
   kms_key_id = awscc_kms_key.cloudtrail_key.key_id
-  is_multi_region_trail = true
-  include_global_service_events = true
 }
 ```
 
