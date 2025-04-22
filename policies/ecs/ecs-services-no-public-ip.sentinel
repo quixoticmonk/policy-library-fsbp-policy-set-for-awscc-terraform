@@ -1,0 +1,57 @@
+# This policy requires resources of type `awscc_ecs_service` to not have public IP addresses assigned automatically.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_service": "awscc_ecs_service",
+	"network_configuration":      "network_configuration",
+	"assign_public_ip":           "assign_public_ip",
+	"constant_value":             "constant_value",
+}
+
+# Get all ECS service resources
+allECSServices = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_service
+}
+
+# Find violations - ECS services with public IP addresses assigned automatically
+violations = []
+
+for allECSServices as address, service {
+	service_config = service.config
+	
+	# Check if network_configuration exists
+	if service_config[const.network_configuration] else null is not null {
+		network_config = service_config[const.network_configuration]
+		
+		# Check if assign_public_ip is set to true
+		if network_config[const.assign_public_ip] else null is not null {
+			assign_public_ip = network_config[const.assign_public_ip]
+			
+			if assign_public_ip[const.constant_value] else null is true {
+				append(violations, service)
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS services with public IP addresses assigned automatically:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

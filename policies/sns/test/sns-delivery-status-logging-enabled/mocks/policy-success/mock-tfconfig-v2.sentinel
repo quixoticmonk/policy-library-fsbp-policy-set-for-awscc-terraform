@@ -1,0 +1,89 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_sns_topic.topic_with_http_logging": {
+		"address": "awscc_sns_topic.topic_with_http_logging",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-with-http-logging",
+			},
+			"display_name": {
+				"constant_value": "Test Topic With HTTP Logging",
+			},
+			"http_success_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-success-feedback",
+			},
+			"http_failure_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-failure-feedback",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_with_http_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+	"awscc_sns_topic.topic_with_sqs_logging": {
+		"address": "awscc_sns_topic.topic_with_sqs_logging",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-with-sqs-logging",
+			},
+			"display_name": {
+				"constant_value": "Test Topic With SQS Logging",
+			},
+			"sqs_success_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-success-feedback",
+			},
+			"sqs_failure_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-failure-feedback",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_with_sqs_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+	"awscc_sns_topic.topic_with_multiple_protocol_logging": {
+		"address": "awscc_sns_topic.topic_with_multiple_protocol_logging",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-with-multiple-protocol-logging",
+			},
+			"display_name": {
+				"constant_value": "Test Topic With Multiple Protocol Logging",
+			},
+			"lambda_success_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-success-feedback",
+			},
+			"lambda_failure_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-failure-feedback",
+			},
+			"application_success_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-success-feedback",
+			},
+			"application_failure_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-failure-feedback",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_with_multiple_protocol_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+}

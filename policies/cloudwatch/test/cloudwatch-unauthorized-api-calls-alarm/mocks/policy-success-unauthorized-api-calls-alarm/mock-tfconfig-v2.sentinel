@@ -1,0 +1,92 @@
+resources = {
+	"awscc_logs_metric_filter.unauthorized_api_calls": {
+		"address": "awscc_logs_metric_filter.unauthorized_api_calls",
+		"config": {
+			"filter_pattern": {
+				"constant_value": "{ ($.errorCode = \"*UnauthorizedOperation\") || ($.errorCode = \"AccessDenied*\") }",
+			},
+			"log_group_name": {
+				"constant_value": "cloudtrail-logs",
+			},
+			"metric_transformations": [
+				{
+					"metric_name": {
+						"constant_value": "unauthorized-api-calls-metric",
+					},
+					"metric_namespace": {
+						"constant_value": "CloudTrailMetrics",
+					},
+					"metric_value": {
+						"constant_value": "1",
+					},
+				},
+			],
+			"name": {
+				"constant_value": "unauthorized-api-calls-filter",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "unauthorized_api_calls",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_logs_metric_filter",
+	},
+	"awscc_cloudwatch_alarm.unauthorized_api_calls": {
+		"address": "awscc_cloudwatch_alarm.unauthorized_api_calls",
+		"config": {
+			"alarm_actions": [
+				{
+					"constant_value": "arn:aws:sns:us-west-2:123456789012:security-alerts",
+				},
+			],
+			"alarm_description": {
+				"constant_value": "Alarm for unauthorized API calls",
+			},
+			"alarm_name": {
+				"constant_value": "unauthorized-api-calls-alarm",
+			},
+			"comparison_operator": {
+				"constant_value": "GreaterThanOrEqualToThreshold",
+			},
+			"evaluation_periods": {
+				"constant_value": 1,
+			},
+			"metric_name": {
+				"constant_value": "unauthorized-api-calls-metric",
+			},
+			"namespace": {
+				"constant_value": "CloudTrailMetrics",
+			},
+			"period": {
+				"constant_value": 300,
+			},
+			"statistic": {
+				"constant_value": "Sum",
+			},
+			"threshold": {
+				"constant_value": 1,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "unauthorized_api_calls",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_cloudwatch_alarm",
+	},
+}
+
+provisioners = {}
+
+variables = {}
+
+outputs = {}
+
+module_calls = {}

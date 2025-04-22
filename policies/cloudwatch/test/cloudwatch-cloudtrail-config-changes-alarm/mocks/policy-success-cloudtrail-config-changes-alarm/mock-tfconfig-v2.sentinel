@@ -1,0 +1,92 @@
+resources = {
+	"awscc_logs_metric_filter.cloudtrail_config_changes": {
+		"address": "awscc_logs_metric_filter.cloudtrail_config_changes",
+		"config": {
+			"filter_pattern": {
+				"constant_value": "{ ($.eventName = CreateTrail) || ($.eventName = UpdateTrail) || ($.eventName = DeleteTrail) || ($.eventName = StartLogging) || ($.eventName = StopLogging) }",
+			},
+			"log_group_name": {
+				"constant_value": "cloudtrail-logs",
+			},
+			"metric_transformations": [
+				{
+					"metric_name": {
+						"constant_value": "cloudtrail-config-changes-metric",
+					},
+					"metric_namespace": {
+						"constant_value": "CloudTrailMetrics",
+					},
+					"metric_value": {
+						"constant_value": "1",
+					},
+				},
+			],
+			"name": {
+				"constant_value": "cloudtrail-config-changes-filter",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cloudtrail_config_changes",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_logs_metric_filter",
+	},
+	"awscc_cloudwatch_alarm.cloudtrail_config_changes": {
+		"address": "awscc_cloudwatch_alarm.cloudtrail_config_changes",
+		"config": {
+			"alarm_actions": [
+				{
+					"constant_value": "arn:aws:sns:us-west-2:123456789012:security-alerts",
+				},
+			],
+			"alarm_description": {
+				"constant_value": "Alarm for CloudTrail configuration changes",
+			},
+			"alarm_name": {
+				"constant_value": "cloudtrail-config-changes-alarm",
+			},
+			"comparison_operator": {
+				"constant_value": "GreaterThanOrEqualToThreshold",
+			},
+			"evaluation_periods": {
+				"constant_value": 1,
+			},
+			"metric_name": {
+				"constant_value": "cloudtrail-config-changes-metric",
+			},
+			"namespace": {
+				"constant_value": "CloudTrailMetrics",
+			},
+			"period": {
+				"constant_value": 300,
+			},
+			"statistic": {
+				"constant_value": "Sum",
+			},
+			"threshold": {
+				"constant_value": 1,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cloudtrail_config_changes",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_cloudwatch_alarm",
+	},
+}
+
+provisioners = {}
+
+variables = {}
+
+outputs = {}
+
+module_calls = {}

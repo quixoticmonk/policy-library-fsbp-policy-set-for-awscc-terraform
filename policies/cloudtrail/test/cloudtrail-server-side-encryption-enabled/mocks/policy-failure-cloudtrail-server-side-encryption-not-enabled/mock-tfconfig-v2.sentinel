@@ -1,0 +1,36 @@
+resources = {
+	"awscc_cloudtrail_trail.example": {
+		"address": "awscc_cloudtrail_trail.example",
+		"config": {
+			"enable_log_file_validation": {
+				"constant_value": true,
+			},
+			"is_multi_region_trail": {
+				"constant_value": true,
+			},
+			"s3_bucket_name": {
+				"constant_value": "example-cloudtrail-bucket",
+			},
+			"trail_name": {
+				"constant_value": "example-trail",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "example",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_cloudtrail_trail",
+	},
+}
+
+provisioners = {}
+
+variables = {}
+
+outputs = {}
+
+module_calls = {}

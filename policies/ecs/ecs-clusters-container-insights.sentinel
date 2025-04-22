@@ -1,0 +1,69 @@
+# This policy requires resources of type `awscc_ecs_cluster` to use Container Insights.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_cluster": "awscc_ecs_cluster",
+	"cluster_settings":          "cluster_settings",
+	"constant_value":            "constant_value",
+	"name":                      "name",
+	"value":                     "value",
+	"container_insights":        "containerInsights",
+	"enabled_value":             "enabled",
+}
+
+# Get all ECS cluster resources
+allECSClusters = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_cluster
+}
+
+# Find violations - ECS clusters without Container Insights enabled
+violations = []
+
+for allECSClusters as address, cluster {
+	cluster_config = cluster.config
+	is_violation = true
+	
+	# Check if cluster_settings exists
+	if cluster_config[const.cluster_settings] else null is not null {
+		cluster_settings = cluster_config[const.cluster_settings]
+		
+		if cluster_settings[const.constant_value] else null is not null {
+			settings = cluster_settings[const.constant_value]
+			
+			# Check each setting
+			for settings as _, setting {
+				if setting[const.name] else null is const.container_insights and
+				   setting[const.value] else null is const.enabled_value {
+					is_violation = false
+					break
+				}
+			}
+		}
+	}
+	
+	if is_violation {
+		append(violations, cluster)
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS clusters without Container Insights enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

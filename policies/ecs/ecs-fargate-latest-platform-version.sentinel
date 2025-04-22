@@ -1,0 +1,63 @@
+# This policy requires resources of type `awscc_ecs_service` with Fargate launch type to run on the latest Fargate platform version.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_service": "awscc_ecs_service",
+	"launch_type":               "launch_type",
+	"constant_value":            "constant_value",
+	"fargate_launch_type":       "FARGATE",
+	"platform_version":          "platform_version",
+	"latest_platform_version":   "LATEST",
+}
+
+# Get all ECS service resources
+allECSServices = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_service
+}
+
+# Find violations - ECS Fargate services not running on the latest platform version
+violations = []
+
+for allECSServices as address, service {
+	service_config = service.config
+	
+	# Check if launch type is FARGATE
+	if service_config[const.launch_type] else null is not null {
+		launch_type = service_config[const.launch_type]
+		
+		if launch_type[const.constant_value] else null is const.fargate_launch_type {
+			# Check if platform_version is set to LATEST
+			if service_config[const.platform_version] else null is not null {
+				platform_version = service_config[const.platform_version]
+				
+				if platform_version[const.constant_value] else null is not const.latest_platform_version {
+					append(violations, service)
+				}
+			} else {
+				# If platform_version is not specified, it defaults to LATEST, so no violation
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS Fargate services not running on the latest platform version:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

@@ -1,0 +1,52 @@
+# This policy requires resources of type `awscc_ecs_task_definition` to not share the host's process namespace.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_task_definition": "awscc_ecs_task_definition",
+	"pid_mode":                          "pid_mode",
+	"constant_value":                    "constant_value",
+	"host_pid_mode":                     "host",
+}
+
+# Get all ECS task definition resources
+allTaskDefinitions = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_task_definition
+}
+
+# Find violations - ECS task definitions that share the host's process namespace
+violations = []
+
+for allTaskDefinitions as address, task_def {
+	task_def_config = task_def.config
+	
+	# Check if pid_mode is "host"
+	if task_def_config[const.pid_mode] else null is not null {
+		pid_mode = task_def_config[const.pid_mode]
+		
+		if pid_mode[const.constant_value] else null is const.host_pid_mode {
+			append(violations, task_def)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS task definitions that share the host's process namespace:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

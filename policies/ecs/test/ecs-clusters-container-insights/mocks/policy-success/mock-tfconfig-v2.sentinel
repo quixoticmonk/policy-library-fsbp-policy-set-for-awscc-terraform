@@ -1,0 +1,30 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ecs_cluster.cluster_with_insights": {
+		"address": "awscc_ecs_cluster.cluster_with_insights",
+		"config": {
+			"cluster_name": {
+				"constant_value": "my-cluster",
+			},
+			"cluster_settings": {
+				"constant_value": [
+					{
+						"name": "containerInsights",
+						"value": "enabled",
+					},
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "cluster_with_insights",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_cluster",
+	},
+}

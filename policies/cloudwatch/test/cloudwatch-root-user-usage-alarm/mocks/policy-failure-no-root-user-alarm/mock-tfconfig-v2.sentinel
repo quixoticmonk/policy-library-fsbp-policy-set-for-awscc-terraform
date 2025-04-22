@@ -1,0 +1,92 @@
+resources = {
+	"awscc_logs_metric_filter.root_user_usage": {
+		"address": "awscc_logs_metric_filter.root_user_usage",
+		"config": {
+			"filter_pattern": {
+				"constant_value": "{ $.userIdentity.type = \"Root\" && $.userIdentity.invokedBy NOT EXISTS && $.eventType != \"AwsServiceEvent\" }",
+			},
+			"log_group_name": {
+				"constant_value": "cloudtrail-logs",
+			},
+			"metric_transformations": [
+				{
+					"metric_name": {
+						"constant_value": "root-user-usage-metric",
+					},
+					"metric_namespace": {
+						"constant_value": "CloudTrailMetrics",
+					},
+					"metric_value": {
+						"constant_value": "1",
+					},
+				},
+			],
+			"name": {
+				"constant_value": "root-user-usage-filter",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "root_user_usage",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_logs_metric_filter",
+	},
+	"awscc_cloudwatch_alarm.other_alarm": {
+		"address": "awscc_cloudwatch_alarm.other_alarm",
+		"config": {
+			"alarm_actions": [
+				{
+					"constant_value": "arn:aws:sns:us-west-2:123456789012:security-alerts",
+				},
+			],
+			"alarm_description": {
+				"constant_value": "Alarm for something else",
+			},
+			"alarm_name": {
+				"constant_value": "other-alarm",
+			},
+			"comparison_operator": {
+				"constant_value": "GreaterThanOrEqualToThreshold",
+			},
+			"evaluation_periods": {
+				"constant_value": 1,
+			},
+			"metric_name": {
+				"constant_value": "other-metric",
+			},
+			"namespace": {
+				"constant_value": "CloudTrailMetrics",
+			},
+			"period": {
+				"constant_value": 300,
+			},
+			"statistic": {
+				"constant_value": "Sum",
+			},
+			"threshold": {
+				"constant_value": 1,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "other_alarm",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_cloudwatch_alarm",
+	},
+}
+
+provisioners = {}
+
+variables = {}
+
+outputs = {}
+
+module_calls = {}

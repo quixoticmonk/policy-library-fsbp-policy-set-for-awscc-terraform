@@ -1,0 +1,36 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ecs_task_definition.secure_task_def": {
+		"address": "awscc_ecs_task_definition.secure_task_def",
+		"config": {
+			"family": {
+				"constant_value": "my-secure-task-family",
+			},
+			"network_mode": {
+				"constant_value": "awsvpc",
+			},
+			"container_definitions": {
+				"constant_value": [
+					{
+						"name": "my-container",
+						"image": "nginx:latest",
+						"essential": true,
+						"user": "nginx",
+						"privileged": false,
+					},
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "secure_task_def",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_task_definition",
+	},
+}

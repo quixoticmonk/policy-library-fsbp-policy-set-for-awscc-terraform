@@ -1,0 +1,99 @@
+# This policy requires resources of type `awscc_ecr_repository` to have tag immutability configured.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+
+const = {
+	"policy_name":                   "ecr-tag-immutability-enabled",
+	"message":                       "ECR private repositories should have tag immutability configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecr-2 for more details.",
+	"address":                       "address",
+	"resource_awscc_ecr_repository": "awscc_ecr_repository",
+	"config":                        "config",
+	"constant_value":                "constant_value",
+	"image_tag_mutability":          "image_tag_mutability",
+	"immutable":                     "IMMUTABLE",
+	"module_prefix":                 "module.",
+	"module_address":                "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a repository has tag immutability enabled
+has_tag_immutability_enabled = func(repo) {
+	if not (repo[const.config] is defined) {
+		return false
+	}
+
+	if not (repo[const.config][const.image_tag_mutability] is defined) {
+		return false
+	}
+
+	image_tag_mutability = repo[const.config][const.image_tag_mutability]
+
+	# Check if image_tag_mutability is set to IMMUTABLE
+	if not (image_tag_mutability[const.constant_value] is defined) {
+		return false
+	}
+
+	return image_tag_mutability[const.constant_value] is const.immutable
+}
+
+# Variables
+
+config_resources = tf.config(tfconfig.resources)
+
+# Get all ECR repository resources
+ecr_resources = config_resources.type(const.resource_awscc_ecr_repository).resources
+
+# Find violations - repositories without tag immutability enabled
+violations = []
+
+for ecr_resources as _, repo {
+	if not has_tag_immutability_enabled(repo) {
+		append(violations, repo)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+
+print(report.generate_policy_report(summary))
+
+# Rules
+
+main = rule {
+	violations is empty
+}

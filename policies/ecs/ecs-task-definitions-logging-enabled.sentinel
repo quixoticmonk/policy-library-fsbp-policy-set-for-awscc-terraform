@@ -1,0 +1,73 @@
+# This policy requires resources of type `awscc_ecs_task_definition` to have a logging configuration.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_task_definition": "awscc_ecs_task_definition",
+	"container_definitions":             "container_definitions",
+	"constant_value":                    "constant_value",
+	"log_configuration":                 "log_configuration",
+	"log_driver":                        "log_driver",
+}
+
+# Get all ECS task definition resources
+allTaskDefinitions = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_task_definition
+}
+
+# Find violations - ECS task definitions without logging configuration
+violations = []
+
+for allTaskDefinitions as address, task_def {
+	task_def_config = task_def.config
+	is_violation = false
+	
+	# Check if container definitions exist
+	if task_def_config[const.container_definitions] else null is not null {
+		container_defs_attr = task_def_config[const.container_definitions]
+		
+		if container_defs_attr[const.constant_value] else null is not null {
+			container_defs = container_defs_attr[const.constant_value]
+			
+			# Check each container definition
+			for container_defs as _, container {
+				# Check if log_configuration exists and has a log_driver
+				if container[const.log_configuration] else null is null {
+					is_violation = true
+					break
+				} else {
+					log_config = container[const.log_configuration]
+					if log_config[const.log_driver] else null is null {
+						is_violation = true
+						break
+					}
+				}
+			}
+		}
+	}
+	
+	if is_violation {
+		append(violations, task_def)
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS task definitions without logging configuration:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

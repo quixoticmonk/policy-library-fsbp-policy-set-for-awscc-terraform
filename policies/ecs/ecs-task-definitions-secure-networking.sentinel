@@ -1,0 +1,84 @@
+# This policy requires resources of type `awscc_ecs_task_definition` to have secure networking modes and user definitions.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_task_definition": "awscc_ecs_task_definition",
+	"container_definitions":             "container_definitions",
+	"network_mode":                      "network_mode",
+	"constant_value":                    "constant_value",
+	"user":                              "user",
+	"privileged":                        "privileged",
+	"host_network_mode":                 "host",
+}
+
+# Get all ECS task definition resources
+allTaskDefinitions = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_task_definition
+}
+
+# Find violations - ECS task definitions with insecure networking modes or missing user definitions
+violations = []
+
+for allTaskDefinitions as address, task_def {
+	task_def_config = task_def.config
+	is_violation = false
+	
+	# Check if network_mode is "host"
+	if task_def_config[const.network_mode] else null is not null {
+		network_mode = task_def_config[const.network_mode]
+		
+		if network_mode[const.constant_value] else null is const.host_network_mode {
+			is_violation = true
+		}
+	}
+	
+	# Check if container definitions have user defined
+	if task_def_config[const.container_definitions] else null is not null {
+		container_defs_attr = task_def_config[const.container_definitions]
+		
+		if container_defs_attr[const.constant_value] else null is not null {
+			container_defs = container_defs_attr[const.constant_value]
+			
+			# Check each container definition
+			for container_defs as _, container {
+				# Check if user is not defined
+				if container[const.user] else null is null {
+					is_violation = true
+					break
+				}
+				
+				# Check if privileged is true
+				if container[const.privileged] else null is true {
+					is_violation = true
+					break
+				}
+			}
+		}
+	}
+	
+	if is_violation {
+		append(violations, task_def)
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS task definitions with insecure networking modes or missing user definitions:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

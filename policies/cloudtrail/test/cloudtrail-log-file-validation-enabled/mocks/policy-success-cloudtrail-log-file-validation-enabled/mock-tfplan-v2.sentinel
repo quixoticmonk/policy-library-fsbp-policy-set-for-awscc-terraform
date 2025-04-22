@@ -1,0 +1,185 @@
+planned_values = {
+	"outputs": {},
+	"resources": {
+		"awscc_cloudtrail_trail.example": {
+			"address":        "awscc_cloudtrail_trail.example",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          null,
+			"mode":           "managed",
+			"module_address": "",
+			"name":           "example",
+			"provider_name":  "registry.terraform.io/hashicorp/awscc",
+			"tainted":        false,
+			"type":           "awscc_cloudtrail_trail",
+			"values": {
+				"enable_log_file_validation": true,
+				"is_multi_region_trail":      true,
+				"is_organization_trail":      false,
+				"s3_bucket_name":             "example-cloudtrail-bucket",
+				"trail_name":                 "example-trail",
+			},
+		},
+	},
+}
+
+variables = {}
+
+resource_changes = {
+	"awscc_cloudtrail_trail.example": {
+		"address": "awscc_cloudtrail_trail.example",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"enable_log_file_validation": true,
+				"is_multi_region_trail":      true,
+				"is_organization_trail":      false,
+				"s3_bucket_name":             "example-cloudtrail-bucket",
+				"trail_name":                 "example-trail",
+			},
+			"after_unknown": {
+				"arn": true,
+				"cloud_watch_logs_log_group_arn": true,
+				"cloud_watch_logs_role_arn":      true,
+				"event_selectors":                true,
+				"home_region":                    true,
+				"id":                             true,
+				"include_global_service_events": true,
+				"insight_selectors":             true,
+				"kms_key_id":                    true,
+				"s3_key_prefix":                 true,
+				"sns_topic_name":                true,
+				"tags":                          true,
+				"tags_all":                      true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          null,
+		"mode":           "managed",
+		"module_address": "",
+		"name":           "example",
+		"provider_name":  "registry.terraform.io/hashicorp/awscc",
+		"type":           "awscc_cloudtrail_trail",
+	},
+}
+
+output_changes = {}
+
+raw = {
+	"configuration": {
+		"provider_config": {
+			"awscc": {
+				"expressions": {
+					"region": {
+						"constant_value": "us-west-2",
+					},
+				},
+				"full_name":          "registry.terraform.io/hashicorp/awscc",
+				"name":               "awscc",
+				"version_constraint": "~> 0.1",
+			},
+		},
+		"root_module": {
+			"resources": [
+				{
+					"address": "awscc_cloudtrail_trail.example",
+					"expressions": {
+						"enable_log_file_validation": {
+							"constant_value": true,
+						},
+						"is_multi_region_trail": {
+							"constant_value": true,
+						},
+						"s3_bucket_name": {
+							"constant_value": "example-cloudtrail-bucket",
+						},
+						"trail_name": {
+							"constant_value": "example-trail",
+						},
+					},
+					"mode":                "managed",
+					"name":                "example",
+					"provider_config_key": "awscc",
+					"schema_version":      0,
+					"type":                "awscc_cloudtrail_trail",
+				},
+			],
+		},
+	},
+	"format_version": "1.1",
+	"planned_values": {
+		"root_module": {
+			"resources": [
+				{
+					"address":        "awscc_cloudtrail_trail.example",
+					"mode":           "managed",
+					"name":           "example",
+					"provider_name":  "registry.terraform.io/hashicorp/awscc",
+					"schema_version": 0,
+					"sensitive_values": {
+						"event_selectors":   [],
+						"insight_selectors": [],
+						"tags":              {},
+						"tags_all":          {},
+					},
+					"type": "awscc_cloudtrail_trail",
+					"values": {
+						"enable_log_file_validation": true,
+						"is_multi_region_trail":      true,
+						"is_organization_trail":      false,
+						"s3_bucket_name":             "example-cloudtrail-bucket",
+						"trail_name":                 "example-trail",
+					},
+				},
+			],
+		},
+	},
+	"resource_changes": [
+		{
+			"address": "awscc_cloudtrail_trail.example",
+			"change": {
+				"actions": [
+					"create",
+				],
+				"after": {
+					"enable_log_file_validation": true,
+					"is_multi_region_trail":      true,
+					"is_organization_trail":      false,
+					"s3_bucket_name":             "example-cloudtrail-bucket",
+					"trail_name":                 "example-trail",
+				},
+				"after_sensitive": {
+					"event_selectors":   [],
+					"insight_selectors": [],
+					"tags":              {},
+					"tags_all":          {},
+				},
+				"after_unknown": {
+					"arn": true,
+					"cloud_watch_logs_log_group_arn": true,
+					"cloud_watch_logs_role_arn":      true,
+					"event_selectors":                true,
+					"home_region":                    true,
+					"id":                             true,
+					"include_global_service_events": true,
+					"insight_selectors":             true,
+					"kms_key_id":                    true,
+					"s3_key_prefix":                 true,
+					"sns_topic_name":                true,
+					"tags":                          true,
+					"tags_all":                      true,
+				},
+				"before":           null,
+				"before_sensitive": false,
+			},
+			"mode":          "managed",
+			"name":          "example",
+			"provider_name": "registry.terraform.io/hashicorp/awscc",
+			"type":          "awscc_cloudtrail_trail",
+		},
+	],
+	"terraform_version": "1.5.7",
+}

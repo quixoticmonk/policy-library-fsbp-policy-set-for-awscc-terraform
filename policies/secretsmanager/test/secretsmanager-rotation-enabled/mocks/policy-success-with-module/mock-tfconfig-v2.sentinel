@@ -1,0 +1,36 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"module.secrets.awscc_secretsmanager_secret.secret_with_rotation_in_module": {
+		"address": "module.secrets.awscc_secretsmanager_secret.secret_with_rotation_in_module",
+		"config": {
+			"name": {
+				"constant_value": "test-secret-with-rotation-in-module",
+			},
+			"description": {
+				"constant_value": "Test secret with rotation enabled in module",
+			},
+			"rotation_enabled": {
+				"constant_value": true,
+			},
+			"rotation_lambda_arn": {
+				"constant_value": "arn:aws:lambda:us-east-1:123456789012:function:rotation-lambda",
+			},
+			"rotation_rules": {
+				"constant_value": {
+					"automatically_after_days": 30,
+				},
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "module.secrets",
+		"name":                "secret_with_rotation_in_module",
+		"provider_config_key": "module.secrets:awscc",
+		"provisioners":        [],
+		"type":                "awscc_secretsmanager_secret",
+	},
+}

@@ -1,0 +1,25 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_secretsmanager_secret.secret_without_rotation": {
+		"address": "awscc_secretsmanager_secret.secret_without_rotation",
+		"config": {
+			"name": {
+				"constant_value": "test-secret-without-rotation",
+			},
+			"description": {
+				"constant_value": "Test secret without rotation enabled",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "secret_without_rotation",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_secretsmanager_secret",
+	},
+}

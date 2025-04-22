@@ -1,0 +1,34 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ecs_service.fargate_service_old_version": {
+		"address": "awscc_ecs_service.fargate_service_old_version",
+		"config": {
+			"cluster": {
+				"constant_value": "my-cluster",
+			},
+			"desired_count": {
+				"constant_value": 2,
+			},
+			"launch_type": {
+				"constant_value": "FARGATE",
+			},
+			"platform_version": {
+				"constant_value": "1.3.0",
+			},
+			"task_definition": {
+				"constant_value": "my-task-definition",
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "fargate_service_old_version",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_service",
+	},
+}

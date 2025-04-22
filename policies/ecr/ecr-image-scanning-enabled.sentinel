@@ -1,0 +1,100 @@
+# This policy requires resources of type `awscc_ecr_repository` to have image scanning configured.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+
+const = {
+	"policy_name":                   "ecr-image-scanning-enabled",
+	"message":                       "ECR private repositories should have image scanning configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ecr-1 for more details.",
+	"address":                       "address",
+	"resource_awscc_ecr_repository": "awscc_ecr_repository",
+	"config":                        "config",
+	"constant_value":                "constant_value",
+	"image_scanning_configuration":  "image_scanning_configuration",
+	"scan_on_push":                  "scan_on_push",
+	"module_prefix":                 "module.",
+	"module_address":                "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a repository has image scanning enabled
+has_image_scanning_enabled = func(repo) {
+	if not (repo[const.config] is defined) {
+		return false
+	}
+
+	if not (repo[const.config][const.image_scanning_configuration] is defined) {
+		return false
+	}
+
+	image_scanning_config = repo[const.config][const.image_scanning_configuration]
+
+	# Check if scan_on_push is set to true
+	if not (image_scanning_config[const.constant_value] is defined and
+		image_scanning_config[const.constant_value][const.scan_on_push] is defined) {
+		return false
+	}
+
+	return image_scanning_config[const.constant_value][const.scan_on_push] is true
+}
+
+# Variables
+
+config_resources = tf.config(tfconfig.resources)
+
+# Get all ECR repository resources
+ecr_resources = config_resources.type(const.resource_awscc_ecr_repository).resources
+
+# Find violations - repositories without image scanning enabled
+violations = []
+
+for ecr_resources as _, repo {
+	if not has_image_scanning_enabled(repo) {
+		append(violations, repo)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+
+print(report.generate_policy_report(summary))
+
+# Rules
+
+main = rule {
+	violations is empty
+}

@@ -1,0 +1,61 @@
+# This policy requires resources of type `awscc_ecs_task_definition` to have containers with read-only access to root filesystems.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+
+# Constants
+
+const = {
+	"resource_awscc_ecs_task_definition": "awscc_ecs_task_definition",
+	"container_definitions":             "container_definitions",
+	"constant_value":                    "constant_value",
+	"readonly_root_filesystem":          "readonly_root_filesystem",
+}
+
+# Get all ECS task definition resources
+allTaskDefinitions = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ecs_task_definition
+}
+
+# Find violations - ECS task definitions with containers that don't have read-only root filesystems
+violations = []
+
+for allTaskDefinitions as address, task_def {
+	task_def_config = task_def.config
+	
+	# Check if container definitions exist
+	if task_def_config[const.container_definitions] else null is not null {
+		container_defs_attr = task_def_config[const.container_definitions]
+		
+		if container_defs_attr[const.constant_value] else null is not null {
+			container_defs = container_defs_attr[const.constant_value]
+			
+			# Check each container definition
+			for container_defs as _, container {
+				# Check if readonly_root_filesystem is false or not defined
+				if container[const.readonly_root_filesystem] else false is false {
+					append(violations, task_def)
+					break
+				}
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("ECS task definitions with containers that don't have read-only root filesystems:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+
+main = rule {
+	length(violations) is 0
+}

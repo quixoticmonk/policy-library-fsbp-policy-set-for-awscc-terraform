@@ -1,0 +1,49 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_sns_topic.topic_without_logging": {
+		"address": "awscc_sns_topic.topic_without_logging",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-without-logging",
+			},
+			"display_name": {
+				"constant_value": "Test Topic Without Logging",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_without_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+	"awscc_sns_topic.topic_with_partial_logging": {
+		"address": "awscc_sns_topic.topic_with_partial_logging",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-with-partial-logging",
+			},
+			"display_name": {
+				"constant_value": "Test Topic With Partial Logging",
+			},
+			"http_success_feedback_role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/sns-success-feedback",
+			},
+			# Missing http_failure_feedback_role_arn
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_with_partial_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+}

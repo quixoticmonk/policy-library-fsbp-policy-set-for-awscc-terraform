@@ -1,0 +1,39 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ecs_service.service_with_public_ip": {
+		"address": "awscc_ecs_service.service_with_public_ip",
+		"config": {
+			"cluster": {
+				"constant_value": "my-cluster",
+			},
+			"desired_count": {
+				"constant_value": 2,
+			},
+			"launch_type": {
+				"constant_value": "FARGATE",
+			},
+			"network_configuration": {
+				"assign_public_ip": {
+					"constant_value": true,
+				},
+				"subnets": {
+					"constant_value": ["subnet-12345", "subnet-67890"],
+				},
+			},
+			"task_definition": {
+				"constant_value": "my-task-definition",
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "service_with_public_ip",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_service",
+	},
+}

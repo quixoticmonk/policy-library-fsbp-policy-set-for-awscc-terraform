@@ -1,0 +1,48 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_sns_topic.topic_without_encryption": {
+		"address": "awscc_sns_topic.topic_without_encryption",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-without-encryption",
+			},
+			"display_name": {
+				"constant_value": "Test Topic Without Encryption",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_without_encryption",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+	"awscc_sns_topic.topic_with_empty_kms_key": {
+		"address": "awscc_sns_topic.topic_with_empty_kms_key",
+		"config": {
+			"name": {
+				"constant_value": "test-topic-with-empty-kms-key",
+			},
+			"display_name": {
+				"constant_value": "Test Topic With Empty KMS Key",
+			},
+			"kms_master_key_id": {
+				"constant_value": "",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "topic_with_empty_kms_key",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sns_topic",
+	},
+}

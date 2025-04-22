@@ -1,0 +1,40 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ecs_task_definition.task_def_with_logging": {
+		"address": "awscc_ecs_task_definition.task_def_with_logging",
+		"config": {
+			"family": {
+				"constant_value": "my-task-family",
+			},
+			"container_definitions": {
+				"constant_value": [
+					{
+						"name": "my-container",
+						"image": "nginx:latest",
+						"essential": true,
+						"user": "nginx",
+						"log_configuration": {
+							"log_driver": "awslogs",
+							"options": {
+								"awslogs-group": "/ecs/my-task-family",
+								"awslogs-region": "us-west-2",
+								"awslogs-stream-prefix": "ecs",
+							},
+						},
+					},
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "task_def_with_logging",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_task_definition",
+	},
+}

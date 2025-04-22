@@ -1,0 +1,32 @@
+resources = {
+	"awscc_ecr_repository.example": {
+		"address": "awscc_ecr_repository.example",
+		"config": {
+			"repository_name": {
+				"constant_value": "example-repo",
+			},
+			"image_scanning_configuration": {
+				"constant_value": {
+					"scan_on_push": true,
+				},
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "example",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ecr_repository",
+	},
+}
+
+provisioners = {}
+
+variables = {}
+
+outputs = {}
+
+module_calls = {}

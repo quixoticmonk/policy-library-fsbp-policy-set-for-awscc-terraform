@@ -1,0 +1,98 @@
+# This policy requires a log metric filter and alarm for IAM policy changes.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "collection" as collection
+import "collection/maps" as maps
+
+# Constants
+const = {
+	"resource_awscc_logs_metric_filter": "awscc_logs_metric_filter",
+	"resource_awscc_cloudwatch_alarm":   "awscc_cloudwatch_alarm",
+	"message":                           "A log metric filter and alarm should exist for IAM policy changes. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/cloudwatch-controls.html#cloudwatch-4 for more details.",
+	"policy_name":                       "cloudwatch-iam-policy-changes-alarm",
+	"constant_value":                    "constant_value",
+	"filter_pattern":                    "filter_pattern",
+	"metric_transformations":            "metric_transformations",
+	"metric_name":                       "metric_name",
+	"alarm_actions":                     "alarm_actions",
+	"metric_name_key":                   "metric_name",
+	"comparison_operator":               "comparison_operator",
+	"evaluation_periods":                "evaluation_periods",
+	"threshold":                         "threshold",
+	"statistic":                         "statistic",
+	"period":                            "period",
+}
+
+# Variables
+metric_filters = tf.config(tfconfig.resources).type(const.resource_awscc_logs_metric_filter).resources
+alarms = tf.config(tfconfig.resources).type(const.resource_awscc_cloudwatch_alarm).resources
+
+# Check if there's at least one metric filter for IAM policy changes
+iam_policy_changes_filter_exists = false
+iam_policy_changes_metric_name = ""
+
+for metric_filters as address, resource {
+	filter_pattern_path = "config." + const.filter_pattern
+	filter_pattern = maps.get(resource, filter_pattern_path + "." + const.constant_value, "")
+
+	# Check if filter pattern contains IAM policy changes detection pattern
+	# The pattern should match events for IAM policy changes
+	if filter_pattern matches ".*[\\s\\S]*CreatePolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*DeletePolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*CreatePolicyVersion[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*DeletePolicyVersion[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*AttachRolePolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*DetachRolePolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*AttachUserPolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*DetachUserPolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*AttachGroupPolicy[\\s\\S]*.*" or
+		filter_pattern matches ".*[\\s\\S]*DetachGroupPolicy[\\s\\S]*.*" {
+
+		# Get the metric name from the filter's metric transformations
+		metric_transformations_path = "config." + const.metric_transformations
+		if maps.get(resource, metric_transformations_path, false) is not false {
+			transformations = maps.get(resource, metric_transformations_path, [])
+			if length(transformations) > 0 {
+				for transformations as idx, transform {
+					metric_name_path = const.metric_name_key
+					if maps.get(transform, metric_name_path + "." + const.constant_value, "") is not "" {
+						iam_policy_changes_filter_exists = true
+						iam_policy_changes_metric_name = maps.get(transform, metric_name_path + "." + const.constant_value, "")
+					}
+				}
+			}
+		}
+	}
+}
+
+# Check if there's at least one alarm configured for the IAM policy changes metric
+iam_policy_changes_alarm_exists = false
+
+if iam_policy_changes_filter_exists and iam_policy_changes_metric_name is not "" {
+	for alarms as address, alarm {
+		alarm_metric_name_path = "config." + const.metric_name
+		alarm_metric_name = maps.get(alarm, alarm_metric_name_path + "." + const.constant_value, "")
+
+		if alarm_metric_name == iam_policy_changes_metric_name {
+			# Check if alarm has actions configured
+			alarm_actions_path = "config." + const.alarm_actions
+			if maps.get(alarm, alarm_actions_path, false) is not false {
+				alarm_actions = maps.get(alarm, alarm_actions_path, [])
+				if length(alarm_actions) > 0 {
+					iam_policy_changes_alarm_exists = true
+				}
+			}
+		}
+	}
+}
+
+# Main rule
+main = rule {
+	iam_policy_changes_filter_exists and iam_policy_changes_alarm_exists
+}

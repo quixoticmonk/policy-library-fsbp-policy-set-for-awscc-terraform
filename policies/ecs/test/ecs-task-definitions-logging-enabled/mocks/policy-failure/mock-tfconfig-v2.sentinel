@@ -1,0 +1,63 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ecs_task_definition.task_def_without_logging": {
+		"address": "awscc_ecs_task_definition.task_def_without_logging",
+		"config": {
+			"family": {
+				"constant_value": "my-task-family",
+			},
+			"container_definitions": {
+				"constant_value": [
+					{
+						"name": "my-container",
+						"image": "nginx:latest",
+						"essential": true,
+						"user": "nginx",
+						// No log_configuration
+					},
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "task_def_without_logging",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_task_definition",
+	},
+	"awscc_ecs_task_definition.task_def_with_incomplete_logging": {
+		"address": "awscc_ecs_task_definition.task_def_with_incomplete_logging",
+		"config": {
+			"family": {
+				"constant_value": "my-task-family-2",
+			},
+			"container_definitions": {
+				"constant_value": [
+					{
+						"name": "my-container",
+						"image": "nginx:latest",
+						"essential": true,
+						"user": "nginx",
+						"log_configuration": {
+							// Missing log_driver
+						},
+					},
+				],
+			},
+		},
+		"count": {},
+		"depends_on": [],
+		"for_each": {},
+		"mode": "managed",
+		"module_address": "",
+		"name": "task_def_with_incomplete_logging",
+		"provider_config_key": "awscc",
+		"provisioners": [],
+		"type": "awscc_ecs_task_definition",
+	},
+}
