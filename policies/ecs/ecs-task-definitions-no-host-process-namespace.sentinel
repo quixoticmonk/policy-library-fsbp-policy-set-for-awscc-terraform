@@ -11,9 +11,9 @@ import "tfconfig/v2" as tfconfig
 
 const = {
 	"resource_awscc_ecs_task_definition": "awscc_ecs_task_definition",
-	"pid_mode":                          "pid_mode",
-	"constant_value":                    "constant_value",
-	"host_pid_mode":                     "host",
+	"pid_mode":                           "pid_mode",
+	"constant_value":                     "constant_value",
+	"host_pid_mode":                      "host",
 }
 
 # Get all ECS task definition resources
@@ -26,11 +26,11 @@ violations = []
 
 for allTaskDefinitions as address, task_def {
 	task_def_config = task_def.config
-	
+
 	# Check if pid_mode is "host"
 	if task_def_config[const.pid_mode] else null is not null {
 		pid_mode = task_def_config[const.pid_mode]
-		
+
 		if pid_mode[const.constant_value] else null is const.host_pid_mode {
 			append(violations, task_def)
 		}

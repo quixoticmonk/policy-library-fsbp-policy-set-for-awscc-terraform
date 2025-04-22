@@ -11,15 +11,15 @@ resources = {
 			"container_definitions": {
 				"constant_value": [
 					{
-						"name": "my-container",
-						"image": "nginx:latest",
+						"name":      "my-container",
+						"image":     "nginx:latest",
 						"essential": true,
-						"user": "nginx",
+						"user":      "nginx",
 						"log_configuration": {
 							"log_driver": "awslogs",
 							"options": {
-								"awslogs-group": "/ecs/my-task-family",
-								"awslogs-region": "us-west-2",
+								"awslogs-group":         "/ecs/my-task-family",
+								"awslogs-region":        "us-west-2",
 								"awslogs-stream-prefix": "ecs",
 							},
 						},
@@ -27,14 +27,14 @@ resources = {
 				],
 			},
 		},
-		"count": {},
-		"depends_on": [],
-		"for_each": {},
-		"mode": "managed",
-		"module_address": "",
-		"name": "task_def_with_logging",
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "task_def_with_logging",
 		"provider_config_key": "awscc",
-		"provisioners": [],
-		"type": "awscc_ecs_task_definition",
+		"provisioners":        [],
+		"type":                "awscc_ecs_task_definition",
 	},
 }

@@ -26,15 +26,15 @@ violations = []
 
 for allECSServices as address, service {
 	service_config = service.config
-	
+
 	# Check if network_configuration exists
 	if service_config[const.network_configuration] else null is not null {
 		network_config = service_config[const.network_configuration]
-		
+
 		# Check if assign_public_ip is set to true
 		if network_config[const.assign_public_ip] else null is not null {
 			assign_public_ip = network_config[const.assign_public_ip]
-			
+
 			if assign_public_ip[const.constant_value] else null is true {
 				append(violations, service)
 			}

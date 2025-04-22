@@ -11,10 +11,10 @@ import "tfconfig/v2" as tfconfig
 
 const = {
 	"resource_awscc_ecs_task_definition": "awscc_ecs_task_definition",
-	"container_definitions":             "container_definitions",
-	"constant_value":                    "constant_value",
-	"log_configuration":                 "log_configuration",
-	"log_driver":                        "log_driver",
+	"container_definitions":              "container_definitions",
+	"constant_value":                     "constant_value",
+	"log_configuration":                  "log_configuration",
+	"log_driver":                         "log_driver",
 }
 
 # Get all ECS task definition resources
@@ -28,14 +28,14 @@ violations = []
 for allTaskDefinitions as address, task_def {
 	task_def_config = task_def.config
 	is_violation = false
-	
+
 	# Check if container definitions exist
 	if task_def_config[const.container_definitions] else null is not null {
 		container_defs_attr = task_def_config[const.container_definitions]
-		
+
 		if container_defs_attr[const.constant_value] else null is not null {
 			container_defs = container_defs_attr[const.constant_value]
-			
+
 			# Check each container definition
 			for container_defs as _, container {
 				# Check if log_configuration exists and has a log_driver
@@ -52,7 +52,7 @@ for allTaskDefinitions as address, task_def {
 			}
 		}
 	}
-	
+
 	if is_violation {
 		append(violations, task_def)
 	}
