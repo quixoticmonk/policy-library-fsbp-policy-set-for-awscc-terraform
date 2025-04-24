@@ -1,0 +1,35 @@
+resources = {
+	"awscc_redshift_cluster.snapshots_disabled": {
+		"address": "awscc_redshift_cluster.snapshots_disabled",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "snapshots-disabled-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			"automated_snapshot_retention_period": {
+				"constant_value": 0,
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "snapshots_disabled",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+}
+
+module_calls = {}

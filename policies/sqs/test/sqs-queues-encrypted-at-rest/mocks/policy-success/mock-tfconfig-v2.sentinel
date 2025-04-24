@@ -1,0 +1,68 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_sqs_queue.queue_with_kms_key": {
+		"address": "awscc_sqs_queue.queue_with_kms_key",
+		"config": {
+			"queue_name": {
+				"constant_value": "test-queue-with-kms-key",
+			},
+			"kms_master_key_id": {
+				"constant_value": "arn:aws:kms:us-west-2:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "queue_with_kms_key",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+	"awscc_sqs_queue.queue_with_sqs_sse": {
+		"address": "awscc_sqs_queue.queue_with_sqs_sse",
+		"config": {
+			"queue_name": {
+				"constant_value": "test-queue-with-sqs-sse",
+			},
+			"sqs_managed_sse_enabled": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "queue_with_sqs_sse",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+	"awscc_sqs_queue.queue_with_both_encryption_types": {
+		"address": "awscc_sqs_queue.queue_with_both_encryption_types",
+		"config": {
+			"queue_name": {
+				"constant_value": "test-queue-with-both-encryption-types",
+			},
+			"kms_master_key_id": {
+				"constant_value": "arn:aws:kms:us-west-2:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab",
+			},
+			"sqs_managed_sse_enabled": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "queue_with_both_encryption_types",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+}

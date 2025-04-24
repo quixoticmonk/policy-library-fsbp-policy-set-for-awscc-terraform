@@ -1,0 +1,125 @@
+# This policy requires resources of type `awscc_dynamodb_table` to be included in a backup plan.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+const = {
+	"policy_name":                     "dynamodb-tables-in-backup-plan",
+	"message":                         "DynamoDB tables should be in a backup plan. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-4 for more details.",
+	"address":                         "address",
+	"resource_awscc_dynamodb_table":   "awscc_dynamodb_table",
+	"resource_awscc_backup_selection": "awscc_backup_selection",
+	"config":         "config",
+	"constant_value": "constant_value",
+	"resources":      "resources",
+	"selection_name": "selection_name",
+	"table_name":     "table_name",
+	"module_prefix":  "module.",
+	"module_address": "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a DynamoDB table is included in a backup plan
+is_table_in_backup_plan = func(table, backup_selections) {
+	if not (table[const.config] is defined) {
+		return false
+	}
+
+	if not (table[const.config][const.table_name] is defined) {
+		return false
+	}
+
+	if not (table[const.config][const.table_name][const.constant_value] is defined) {
+		return false
+	}
+
+	table_name = table[const.config][const.table_name][const.constant_value]
+	table_arn = "*:table/" + table_name
+
+	for backup_selections as _, selection {
+		if not (selection[const.config] is defined) {
+			continue
+		}
+
+		if not (selection[const.config][const.resources] is defined) {
+			continue
+		}
+
+		if not (selection[const.config][const.resources][const.constant_value] is defined) {
+			continue
+		}
+
+		resources_list = selection[const.config][const.resources][const.constant_value]
+
+		for resources_list as _, resource_arn {
+			# Check if the backup selection includes this table
+			# Either directly or via a wildcard pattern
+			if strings.has_suffix(resource_arn, table_arn) or
+				(strings.has_suffix(resource_arn, "*") and
+					strings.has_prefix(table_arn, strings.trim_suffix(resource_arn, "*"))) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all DynamoDB table resources
+table_resources = config_resources.type(const.resource_awscc_dynamodb_table).resources
+
+# Get all AWS Backup selection resources
+backup_selection_resources = config_resources.type(const.resource_awscc_backup_selection).resources
+
+# Find violations - Tables not included in any backup plan
+violations = []
+
+for table_resources as _, table {
+	if not is_table_in_backup_plan(table, backup_selection_resources) {
+		append(violations, table)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

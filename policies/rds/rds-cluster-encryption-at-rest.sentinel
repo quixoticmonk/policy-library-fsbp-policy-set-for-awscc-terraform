@@ -1,0 +1,49 @@
+# This policy requires RDS DB clusters to have encryption at rest enabled
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_rds_db_cluster": "awscc_rds_db_cluster",
+	"storage_encrypted":             "storage_encrypted",
+	"constant_value":                "constant_value",
+}
+
+# Get all RDS DB cluster resources
+allRDSDBClusters = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_rds_db_cluster
+}
+
+# Find violations - RDS DB clusters without encryption at rest enabled
+violations = []
+
+for allRDSDBClusters as address, cluster {
+	cluster_config = cluster.config
+
+	# Check if storage_encrypted is set to false or not set
+	if cluster_config[const.storage_encrypted] else null is null {
+		append(violations, cluster)
+	} else {
+		storage_encrypted = cluster_config[const.storage_encrypted]
+		if storage_encrypted[const.constant_value] else false is false {
+			append(violations, cluster)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("RDS DB clusters without encryption at rest enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

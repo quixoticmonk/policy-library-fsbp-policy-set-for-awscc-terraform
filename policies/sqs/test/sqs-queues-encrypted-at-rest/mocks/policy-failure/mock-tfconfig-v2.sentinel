@@ -1,0 +1,62 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_sqs_queue.queue_without_encryption": {
+		"address": "awscc_sqs_queue.queue_without_encryption",
+		"config": {
+			"queue_name": {
+				"constant_value": "test-queue-without-encryption",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "queue_without_encryption",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+	"awscc_sqs_queue.queue_with_empty_kms_key": {
+		"address": "awscc_sqs_queue.queue_with_empty_kms_key",
+		"config": {
+			"queue_name": {
+				"constant_value": "test-queue-with-empty-kms-key",
+			},
+			"kms_master_key_id": {
+				"constant_value": "",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "queue_with_empty_kms_key",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+	"awscc_sqs_queue.queue_with_false_sse": {
+		"address": "awscc_sqs_queue.queue_with_false_sse",
+		"config": {
+			"queue_name": {
+				"constant_value": "test-queue-with-false-sse",
+			},
+			"sqs_managed_sse_enabled": {
+				"constant_value": false,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "queue_with_false_sse",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+}

@@ -1,0 +1,38 @@
+resources = {
+	"awscc_redshift_cluster_parameter_group.encrypted_transit": {
+		"address": "awscc_redshift_cluster_parameter_group.encrypted_transit",
+		"config": {
+			"description": {
+				"constant_value": "Parameter group with SSL enabled",
+			},
+			"parameter_group_name": {
+				"constant_value": "encrypted-transit-param-group",
+			},
+			"parameter_group_family": {
+				"constant_value": "redshift-1.0",
+			},
+			"parameters": {
+				"constant_value": [
+					{
+						"parameter_name":  "require_ssl",
+						"parameter_value": "true",
+					},
+					{
+						"parameter_name":  "enable_user_activity_logging",
+						"parameter_value": "true",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "encrypted_transit",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster_parameter_group",
+	},
+}
+
+module_calls = {}

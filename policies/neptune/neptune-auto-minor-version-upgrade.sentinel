@@ -1,0 +1,51 @@
+# Policy that requires Neptune DB clusters to have automatic minor version upgrades enabled
+# This policy validates that all Neptune DB instances have AutoMinorVersionUpgrade set to true
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_neptune_db_instance": "awscc_neptune_db_instance",
+	"auto_minor_version_upgrade":         "auto_minor_version_upgrade",
+	"constant_value":                     "constant_value",
+}
+
+# Get all Neptune DB instances
+allNeptuneDBInstances = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_neptune_db_instance
+}
+
+# Find violations - Neptune DB instances that don't have auto minor version upgrade enabled
+violations = []
+
+for allNeptuneDBInstances as address, instance {
+	instance_config = instance.config
+
+	# Check if auto_minor_version_upgrade is set to true
+	if instance_config[const.auto_minor_version_upgrade] else null is null {
+		append(violations, instance)
+	} else {
+		auto_upgrade_config = instance_config[const.auto_minor_version_upgrade]
+
+		if auto_upgrade_config.constant_value is not true {
+			append(violations, instance)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("Neptune DB instances without automatic minor version upgrades enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Main rule
+main = rule {
+	length(violations) is 0
+}

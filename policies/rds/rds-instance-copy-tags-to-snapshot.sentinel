@@ -1,0 +1,49 @@
+# This policy requires RDS DB instances to be configured to copy tags to snapshots
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_rds_db_instance": "awscc_rds_db_instance",
+	"copy_tags_to_snapshot":          "copy_tags_to_snapshot",
+	"constant_value":                 "constant_value",
+}
+
+# Get all RDS DB instance resources
+allRDSDBInstances = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_rds_db_instance
+}
+
+# Find violations - RDS DB instances not configured to copy tags to snapshots
+violations = []
+
+for allRDSDBInstances as address, instance {
+	instance_config = instance.config
+
+	# Check if copy_tags_to_snapshot is set to false or not set
+	if instance_config[const.copy_tags_to_snapshot] else null is null {
+		append(violations, instance)
+	} else {
+		copy_tags_to_snapshot = instance_config[const.copy_tags_to_snapshot]
+		if copy_tags_to_snapshot[const.constant_value] else false is false {
+			append(violations, instance)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("RDS DB instances not configured to copy tags to snapshots:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

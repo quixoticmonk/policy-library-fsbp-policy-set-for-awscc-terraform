@@ -1,0 +1,97 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			// No object_lock_enabled or object_lock_configuration
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"object_lock_enabled": {
+				"constant_value": true,
+			},
+			// Missing object_lock_configuration
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket3": {
+		"address": "awscc_s3_bucket.bucket3",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-3",
+			},
+			// Missing object_lock_enabled
+			"object_lock_configuration": {
+				"object_lock_enabled": {
+					"constant_value": "Enabled",
+				},
+				"rule": {
+					"default_retention": {
+						"mode": {
+							"constant_value": "COMPLIANCE",
+						},
+						"days": {
+							"constant_value": 365,
+						},
+					},
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket3",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket4": {
+		"address": "awscc_s3_bucket.bucket4",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-4",
+			},
+			"object_lock_enabled": {
+				"constant_value": false, // Explicitly disabled
+			},
+			"object_lock_configuration": {
+				"object_lock_enabled": {
+					"constant_value": "Enabled",
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket4",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

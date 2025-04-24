@@ -6,19 +6,14 @@
 # Imports
 
 import "tfconfig/v2" as tfconfig
-import "tfresources" as tf
-import "report" as report
 import "strings"
 
 # Constants
 
 const = {
-	"policy_name":               "sns-delivery-status-logging-enabled",
-	"message":                   "Logging of delivery status should be enabled for notification messages sent to a topic. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-sns-2 for more details.",
-	"address":                   "address",
-	"resource_awscc_sns_topic":  "awscc_sns_topic",
-	"config":                    "config",
-	"constant_value":            "constant_value",
+	"policy_name":              "sns-delivery-status-logging-enabled",
+	"message":                  "Logging of delivery status should be enabled for notification messages sent to a topic. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-sns-2 for more details.",
+	"resource_awscc_sns_topic": "awscc_sns_topic",
 	"http":                      "http",
 	"sqs":                       "sqs",
 	"lambda":                    "lambda",
@@ -26,95 +21,62 @@ const = {
 	"firehose":                  "firehose",
 	"success_feedback_role_arn": "success_feedback_role_arn",
 	"failure_feedback_role_arn": "failure_feedback_role_arn",
-	"module_prefix":             "module.",
-	"module_address":            "module_address",
 }
-
-# Functions
-
-# Removes module address prefix from a resource
-# and returns back the localized address for a module.
-resource_address_without_module_address = func(res) {
-	resource_addr = res[const.address]
-
-	# Check for root module
-	if not strings.has_prefix(resource_addr, const.module_prefix) {
-		return resource_addr
-	}
-
-	module_addr_prefix = res[const.module_address] + "."
-	return strings.trim_prefix(resource_addr, module_addr_prefix)
-}
-
-# Check if an SNS topic has delivery status logging enabled for at least one protocol
-has_delivery_status_logging = func(topic) {
-	if not (topic[const.config] is defined) {
-		return false
-	}
-
-	# Check for HTTP protocol logging
-	http_success_logging = topic[const.config][const.http + "_" + const.success_feedback_role_arn] is defined
-	http_failure_logging = topic[const.config][const.http + "_" + const.failure_feedback_role_arn] is defined
-
-	# Check for SQS protocol logging
-	sqs_success_logging = topic[const.config][const.sqs + "_" + const.success_feedback_role_arn] is defined
-	sqs_failure_logging = topic[const.config][const.sqs + "_" + const.failure_feedback_role_arn] is defined
-
-	# Check for Lambda protocol logging
-	lambda_success_logging = topic[const.config][const.lambda + "_" + const.success_feedback_role_arn] is defined
-	lambda_failure_logging = topic[const.config][const.lambda + "_" + const.failure_feedback_role_arn] is defined
-
-	# Check for Application protocol logging
-	application_success_logging = topic[const.config][const.application + "_" + const.success_feedback_role_arn] is defined
-	application_failure_logging = topic[const.config][const.application + "_" + const.failure_feedback_role_arn] is defined
-
-	# Check for Firehose protocol logging
-	firehose_success_logging = topic[const.config][const.firehose + "_" + const.success_feedback_role_arn] is defined
-	firehose_failure_logging = topic[const.config][const.firehose + "_" + const.failure_feedback_role_arn] is defined
-
-	# At least one protocol should have both success and failure logging enabled
-	http_logging = http_success_logging and http_failure_logging
-	sqs_logging = sqs_success_logging and sqs_failure_logging
-	lambda_logging = lambda_success_logging and lambda_failure_logging
-	application_logging = application_success_logging and application_failure_logging
-	firehose_logging = firehose_success_logging and firehose_failure_logging
-
-	return http_logging or sqs_logging or lambda_logging or application_logging or firehose_logging
-}
-
-# Variables
-
-config_resources = tf.config(tfconfig.resources)
 
 # Get all SNS topic resources
-topic_resources = config_resources.type(const.resource_awscc_sns_topic).resources
+allSNSTopics = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_sns_topic
+}
 
 # Find violations - SNS topics without delivery status logging
 violations = []
 
-for topic_resources as _, topic {
-	if not has_delivery_status_logging(topic) {
+for allSNSTopics as address, topic {
+	topic_config = topic.config
+	has_logging = false
+
+	# Check for HTTP protocol logging
+	http_success_logging = topic_config[const.http + "_" + const.success_feedback_role_arn] else null is not null
+	http_failure_logging = topic_config[const.http + "_" + const.failure_feedback_role_arn] else null is not null
+	http_logging = http_success_logging and http_failure_logging
+
+	# Check for SQS protocol logging
+	sqs_success_logging = topic_config[const.sqs + "_" + const.success_feedback_role_arn] else null is not null
+	sqs_failure_logging = topic_config[const.sqs + "_" + const.failure_feedback_role_arn] else null is not null
+	sqs_logging = sqs_success_logging and sqs_failure_logging
+
+	# Check for Lambda protocol logging
+	lambda_success_logging = topic_config[const.lambda + "_" + const.success_feedback_role_arn] else null is not null
+	lambda_failure_logging = topic_config[const.lambda + "_" + const.failure_feedback_role_arn] else null is not null
+	lambda_logging = lambda_success_logging and lambda_failure_logging
+
+	# Check for Application protocol logging
+	application_success_logging = topic_config[const.application + "_" + const.success_feedback_role_arn] else null is not null
+	application_failure_logging = topic_config[const.application + "_" + const.failure_feedback_role_arn] else null is not null
+	application_logging = application_success_logging and application_failure_logging
+
+	# Check for Firehose protocol logging
+	firehose_success_logging = topic_config[const.firehose + "_" + const.success_feedback_role_arn] else null is not null
+	firehose_failure_logging = topic_config[const.firehose + "_" + const.failure_feedback_role_arn] else null is not null
+	firehose_logging = firehose_success_logging and firehose_failure_logging
+
+	# At least one protocol should have both success and failure logging enabled
+	has_logging = http_logging or sqs_logging or lambda_logging or application_logging or firehose_logging
+
+	if not has_logging {
 		append(violations, topic)
 	}
 }
 
-summary = {
-	"policy_name": const.policy_name,
-	"violations": map violations as _, v {
-		{
-			"address":        v.address,
-			"module_address": v.module_address,
-			"message":        const.message,
-		}
-	},
+# Print violations for debugging
+if length(violations) > 0 {
+	print("SNS topics without delivery status logging enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
 }
 
-# Outputs
-
-print(report.generate_policy_report(summary))
-
 # Rules
-
 main = rule {
-	violations is empty
+	length(violations) is 0
 }

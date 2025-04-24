@@ -1,0 +1,71 @@
+# This policy requires S3 buckets to have cross-region replication enabled
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket":  "awscc_s3_bucket",
+	"replication_configuration": "replication_configuration",
+	"rules":                     "rules",
+	"constant_value":            "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets without cross-region replication enabled
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if replication_configuration is set
+	if bucket_config[const.replication_configuration] else null is null {
+		append(violations, bucket)
+	} else {
+		replication_config = bucket_config[const.replication_configuration]
+
+		# Check if rules are defined
+		if replication_config[const.rules] else null is null {
+			append(violations, bucket)
+		} else {
+			rules = replication_config[const.rules]
+			if length(rules) is 0 {
+				append(violations, bucket)
+			} else {
+				# Check if at least one rule is enabled
+				has_enabled_rule = false
+				for rules as idx, rule_obj {
+					if rule_obj["status"] else null is not null {
+						if rule_obj["status"][const.constant_value] is "Enabled" {
+							has_enabled_rule = true
+						}
+					}
+				}
+
+				if not has_enabled_rule {
+					append(violations, bucket)
+				}
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets without cross-region replication enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

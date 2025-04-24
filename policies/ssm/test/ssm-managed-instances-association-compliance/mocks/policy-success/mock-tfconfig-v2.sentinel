@@ -1,0 +1,67 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ssm_association.compliant_association_critical": {
+		"address": "awscc_ssm_association.compliant_association_critical",
+		"config": {
+			"name": {
+				"constant_value": "AWS-UpdateSSMAgent",
+			},
+			"targets": {
+				"constant_value": [
+					{
+						"key":    "InstanceIds",
+						"values": ["i-0123456789abcdef0"],
+					},
+				],
+			},
+			"compliance_severity": {
+				"constant_value": "CRITICAL",
+			},
+			"schedule_expression": {
+				"constant_value": "rate(7 days)",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "compliant_association_critical",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_association",
+	},
+	"awscc_ssm_association.compliant_association_high": {
+		"address": "awscc_ssm_association.compliant_association_high",
+		"config": {
+			"name": {
+				"constant_value": "AWS-UpdateSSMAgent",
+			},
+			"targets": {
+				"constant_value": [
+					{
+						"key":    "InstanceIds",
+						"values": ["i-0123456789abcdef1"],
+					},
+				],
+			},
+			"compliance_severity": {
+				"constant_value": "HIGH",
+			},
+			"schedule_expression": {
+				"constant_value": "rate(7 days)",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "compliant_association_high",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_association",
+	},
+}

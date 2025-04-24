@@ -1,0 +1,66 @@
+terraform_version = "1.5.0"
+
+planned_values = {
+	"outputs": {},
+	"resources": {
+		"awscc_stepfunctions_state_machine.no_logging": {
+			"address":        "awscc_stepfunctions_state_machine.no_logging",
+			"mode":           "managed",
+			"type":           "awscc_stepfunctions_state_machine",
+			"name":           "no_logging",
+			"provider_name":  "registry.terraform.io/hashicorp/awscc",
+			"schema_version": 0,
+			"values": {
+				"definition":         "{\"Comment\":\"A Hello World example of the Amazon States Language using Pass states\",\"StartAt\":\"Hello\",\"States\":{\"Hello\":{\"Type\":\"Pass\",\"Result\":\"Hello\",\"Next\":\"World\"},\"World\":{\"Type\":\"Pass\",\"Result\":\"World\",\"End\":true}}}",
+				"role_arn":           "arn:aws:iam::123456789012:role/service-role/StepFunctions-StateMachine-Role",
+				"state_machine_name": "no-logging-state-machine",
+				"state_machine_type": "STANDARD",
+				"tags": [
+					{
+						"key":   "Name",
+						"value": "no-logging-state-machine",
+					},
+				],
+			},
+		},
+	},
+}
+
+resource_changes = {
+	"awscc_stepfunctions_state_machine.no_logging": {
+		"address":       "awscc_stepfunctions_state_machine.no_logging",
+		"mode":          "managed",
+		"type":          "awscc_stepfunctions_state_machine",
+		"name":          "no_logging",
+		"provider_name": "registry.terraform.io/hashicorp/awscc",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"before": null,
+			"after": {
+				"definition":         "{\"Comment\":\"A Hello World example of the Amazon States Language using Pass states\",\"StartAt\":\"Hello\",\"States\":{\"Hello\":{\"Type\":\"Pass\",\"Result\":\"Hello\",\"Next\":\"World\"},\"World\":{\"Type\":\"Pass\",\"Result\":\"World\",\"End\":true}}}",
+				"role_arn":           "arn:aws:iam::123456789012:role/service-role/StepFunctions-StateMachine-Role",
+				"state_machine_name": "no-logging-state-machine",
+				"state_machine_type": "STANDARD",
+				"tags": [
+					{
+						"key":   "Name",
+						"value": "no-logging-state-machine",
+					},
+				],
+			},
+			"after_unknown": {
+				"arn":           true,
+				"creation_date": true,
+				"id":            true,
+				"logging_configuration": true,
+				"status":                true,
+				"tags": [
+					{},
+				],
+				"tags_all": true,
+			},
+		},
+	},
+}

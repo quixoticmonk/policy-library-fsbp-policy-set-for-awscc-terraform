@@ -1,0 +1,53 @@
+# TITLE: SSM.4 SSM documents should not be public
+# DESCRIPTION: This policy ensures that AWS Systems Manager documents are not publicly accessible.
+# RESOURCE: awscc_ssm_document
+
+# Import tfconfig/v2 as tfconfig
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_ssm_document": "awscc_ssm_document",
+	"permissions":                 "permissions",
+	"constant_value":              "constant_value",
+	"account_ids":                 "account_ids",
+	"shared_with_everyone":        "all",
+}
+
+# Get all SSM documents
+allSSMDocuments = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ssm_document
+}
+
+# Filter to SSM documents that are public
+violatingSSMDocuments = []
+
+for allSSMDocuments as address, document {
+	document_config = document.config
+
+	# Check if permissions is set
+	if document_config[const.permissions] else null is not null {
+		permissions = document_config[const.permissions][const.constant_value]
+
+		# Check if account_ids contains "all" which makes the document public
+		if permissions[const.account_ids] else [] contains const.shared_with_everyone {
+			append(violatingSSMDocuments, document)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violatingSSMDocuments) > 0 {
+	print("SSM documents that are publicly accessible:")
+	for violatingSSMDocuments as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Count violations
+violations = length(violatingSSMDocuments)
+
+# Main rule
+main = rule {
+	violations is 0
+}

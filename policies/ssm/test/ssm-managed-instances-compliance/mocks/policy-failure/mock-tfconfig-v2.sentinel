@@ -1,0 +1,85 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ssm_patch_baseline.non_compliant_baseline": {
+		"address": "awscc_ssm_patch_baseline.non_compliant_baseline",
+		"config": {
+			"name": {
+				"constant_value": "non-compliant-baseline",
+			},
+			"description": {
+				"constant_value": "Patch baseline for non-compliant instances",
+			},
+			"operating_system": {
+				"constant_value": "AMAZON_LINUX_2",
+			},
+			"approval_rules": {
+				"constant_value": {
+					"patch_rules": [
+						{
+							"approve_after_days": 7,
+							"compliance_level":   "MEDIUM",
+							"patch_filter_group": {
+								"patch_filters": [
+									{
+										"key":    "PRODUCT",
+										"values": ["AmazonLinux2"],
+									},
+								],
+							},
+						},
+					],
+				},
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "non-compliant-baseline",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "non_compliant_baseline",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_patch_baseline",
+	},
+	"awscc_ssm_patch_baseline.no_approval_rules": {
+		"address": "awscc_ssm_patch_baseline.no_approval_rules",
+		"config": {
+			"name": {
+				"constant_value": "no-approval-rules-baseline",
+			},
+			"description": {
+				"constant_value": "Patch baseline without approval rules",
+			},
+			"operating_system": {
+				"constant_value": "AMAZON_LINUX_2",
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "no-approval-rules-baseline",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "no_approval_rules",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_patch_baseline",
+	},
+}

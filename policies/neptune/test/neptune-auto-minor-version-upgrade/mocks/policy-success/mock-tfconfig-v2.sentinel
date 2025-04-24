@@ -1,0 +1,41 @@
+import "strings"
+
+providers = {
+	"awscc": {
+		"alias":               "",
+		"config":              {},
+		"module_address":      "",
+		"name":                "awscc",
+		"provider_config_key": "awscc",
+		"version_constraint":  "",
+	},
+}
+
+resources = {
+	"awscc_neptune_db_instance.auto_upgrade": {
+		"address": "awscc_neptune_db_instance.auto_upgrade",
+		"config": {
+			"db_instance_identifier": {
+				"constant_value": "neptune-instance-auto-upgrade",
+			},
+			"db_instance_class": {
+				"constant_value": "db.r5.large",
+			},
+			"engine": {
+				"constant_value": "neptune",
+			},
+			"auto_minor_version_upgrade": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "auto_upgrade",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_neptune_db_instance",
+	},
+}

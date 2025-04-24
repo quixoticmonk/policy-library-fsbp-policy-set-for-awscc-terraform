@@ -1,0 +1,51 @@
+# This policy requires S3 buckets to have server-side encryption enabled
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket":             "awscc_s3_bucket",
+	"bucket_encryption":                    "bucket_encryption",
+	"server_side_encryption_configuration": "server_side_encryption_configuration",
+	"constant_value":                       "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets without server-side encryption enabled
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if bucket_encryption is set
+	if bucket_config[const.bucket_encryption] else null is null {
+		append(violations, bucket)
+	} else {
+		# Check if server_side_encryption_configuration is set
+		bucket_encryption = bucket_config[const.bucket_encryption]
+		if bucket_encryption[const.server_side_encryption_configuration] else null is null {
+			append(violations, bucket)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets without server-side encryption enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

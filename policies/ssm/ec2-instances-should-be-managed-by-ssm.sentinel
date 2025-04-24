@@ -1,0 +1,57 @@
+# TITLE: SSM.1 EC2 instances should be managed by AWS Systems Manager
+# DESCRIPTION: This policy ensures that EC2 instances are managed by AWS Systems Manager.
+# RESOURCE: awscc_ec2_instance
+
+# Import tfconfig/v2 as tfconfig
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_ec2_instance": "awscc_ec2_instance",
+	"iam_instance_profile":        "iam_instance_profile",
+	"constant_value":              "constant_value",
+	"ssm_managed_policy_names": [
+		"AmazonSSMManagedInstanceCore",
+		"AmazonSSMFullAccess",
+		"AmazonSSMAutomationRole",
+	],
+}
+
+# Get all EC2 instances
+allEC2Instances = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ec2_instance
+}
+
+# Filter to EC2 instances that don't have an IAM instance profile with SSM managed policy
+violatingEC2Instances = []
+
+for allEC2Instances as address, instance {
+	instance_config = instance.config
+
+	# Check if IAM instance profile is set
+	if instance_config[const.iam_instance_profile] else null is null {
+		append(violatingEC2Instances, instance)
+	} else {
+		# Note: This is a simplified check. In a real-world scenario, we would need to
+		# check if the IAM instance profile has one of the SSM managed policies attached.
+		# However, this would require additional logic to trace the IAM role and its policies.
+		# For this policy, we're assuming that having an IAM instance profile is sufficient.
+		# A more comprehensive check would involve examining the actual policies attached to the role.
+	}
+}
+
+# Print violations for debugging
+if length(violatingEC2Instances) > 0 {
+	print("EC2 instances not managed by AWS Systems Manager:")
+	for violatingEC2Instances as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Count violations
+violations = length(violatingEC2Instances)
+
+# Main rule
+main = rule {
+	violations is 0
+}

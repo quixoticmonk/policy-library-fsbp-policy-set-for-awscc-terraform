@@ -1,0 +1,76 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			// No bucket_encryption
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"bucket_encryption": {
+				"server_side_encryption_configuration": [
+					{
+						"server_side_encryption_by_default": {
+							"sse_algorithm": {
+								"constant_value": "AES256", // Not using KMS
+							},
+						},
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket3": {
+		"address": "awscc_s3_bucket.bucket3",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-3",
+			},
+			"bucket_encryption": {
+				"server_side_encryption_configuration": [
+					{
+						"server_side_encryption_by_default": {
+							"sse_algorithm": {
+								"constant_value": "aws:kms",
+							},
+							// Missing KMS key ID
+						},
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket3",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

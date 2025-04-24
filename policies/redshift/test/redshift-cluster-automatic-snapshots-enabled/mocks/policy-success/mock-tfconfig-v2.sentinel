@@ -1,0 +1,64 @@
+resources = {
+	"awscc_redshift_cluster.snapshots_enabled": {
+		"address": "awscc_redshift_cluster.snapshots_enabled",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "snapshots-enabled-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			"automated_snapshot_retention_period": {
+				"constant_value": 7,
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "snapshots_enabled",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+	"awscc_redshift_cluster.default_snapshots": {
+		"address": "awscc_redshift_cluster.default_snapshots",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "default-snapshots-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			# No automated_snapshot_retention_period specified, defaults to 1
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "default_snapshots",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+}
+
+module_calls = {}

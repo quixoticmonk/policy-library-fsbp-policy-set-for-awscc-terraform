@@ -1,0 +1,52 @@
+# TITLE: SSM.3 EC2 instances managed by Systems Manager should have an association compliance status of COMPLIANT
+# DESCRIPTION: This policy ensures that EC2 instances managed by AWS Systems Manager have an association compliance status of COMPLIANT.
+# RESOURCE: awscc_ssm_association
+
+# Import tfconfig/v2 as tfconfig
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_ssm_association": "awscc_ssm_association",
+	"compliance_severity":            "compliance_severity",
+	"constant_value":                 "constant_value",
+	"compliant_severities":           ["CRITICAL", "HIGH"],
+}
+
+# Get all SSM associations
+allSSMAssociations = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ssm_association
+}
+
+# Filter to SSM associations that don't have proper compliance severity
+violatingSSMAssociations = []
+
+for allSSMAssociations as address, association {
+	association_config = association.config
+
+	# Check if compliance_severity is set and is CRITICAL or HIGH
+	if association_config[const.compliance_severity] else null is null {
+		append(violatingSSMAssociations, association)
+	} else {
+		severity = association_config[const.compliance_severity][const.constant_value]
+		if severity not in const.compliant_severities {
+			append(violatingSSMAssociations, association)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violatingSSMAssociations) > 0 {
+	print("SSM associations without proper compliance severity:")
+	for violatingSSMAssociations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Count violations
+violations = length(violatingSSMAssociations)
+
+# Main rule
+main = rule {
+	violations is 0
+}

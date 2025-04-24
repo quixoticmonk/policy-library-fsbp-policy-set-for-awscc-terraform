@@ -1,0 +1,123 @@
+# This policy requires resources of type `awscc_redshift_cluster` to have audit logging enabled.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+import "types"
+
+# Constants
+const = {
+	"policy_name":                     "redshift-cluster-audit-logging-enabled",
+	"message":                         "Amazon Redshift clusters should have audit logging enabled. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-4 for more details.",
+	"address":                         "address",
+	"resource_awscc_redshift_cluster": "awscc_redshift_cluster",
+	"config":             "config",
+	"constant_value":     "constant_value",
+	"logging_properties": "logging_properties",
+	"log_exports":        "log_exports",
+	"connectionlog":      "connectionlog",
+	"userlog":            "userlog",
+	"useractivitylog":    "useractivitylog",
+	"module_prefix":      "module.",
+	"module_address":     "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a Redshift cluster has audit logging enabled
+has_audit_logging_enabled = func(cluster) {
+	if not (cluster[const.config] is defined) {
+		return false
+	}
+
+	if not (cluster[const.config][const.logging_properties] is defined) {
+		return false
+	}
+
+	logging_props = cluster[const.config][const.logging_properties][const.constant_value]
+
+	if not (types.type_of(logging_props) == "map") {
+		return false
+	}
+
+	if not (logging_props[const.log_exports] is defined) {
+		return false
+	}
+
+	log_exports = logging_props[const.log_exports]
+
+	has_connectionlog = false
+	has_userlog = false
+	has_useractivitylog = false
+
+	for log_exports as _, export {
+		if export == const.connectionlog {
+			has_connectionlog = true
+		}
+		if export == const.userlog {
+			has_userlog = true
+		}
+		if export == const.useractivitylog {
+			has_useractivitylog = true
+		}
+	}
+
+	if has_connectionlog and has_userlog and has_useractivitylog {
+		return true
+	} else {
+		return false
+	}
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all Redshift cluster resources
+redshift_resources = config_resources.type(const.resource_awscc_redshift_cluster).resources
+
+# Find violations - Redshift clusters without audit logging enabled
+violations = []
+
+for redshift_resources as _, cluster {
+	if not has_audit_logging_enabled(cluster) {
+		append(violations, cluster)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

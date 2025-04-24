@@ -1,0 +1,80 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_rds_db_cluster.cluster_without_az": {
+		"address": "awscc_rds_db_cluster.cluster_without_az",
+		"config": {
+			"engine": {
+				"constant_value": "aurora-mysql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cluster_without_az",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_cluster",
+	},
+	"awscc_rds_db_cluster.cluster_with_single_az": {
+		"address": "awscc_rds_db_cluster.cluster_with_single_az",
+		"config": {
+			"engine": {
+				"constant_value": "aurora-mysql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"availability_zones": {
+				"constant_value": ["us-west-2a"],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cluster_with_single_az",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_cluster",
+	},
+	"awscc_rds_db_cluster.cluster_with_empty_az": {
+		"address": "awscc_rds_db_cluster.cluster_with_empty_az",
+		"config": {
+			"engine": {
+				"constant_value": "aurora-mysql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"availability_zones": {
+				"constant_value": [],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cluster_with_empty_az",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_cluster",
+	},
+}

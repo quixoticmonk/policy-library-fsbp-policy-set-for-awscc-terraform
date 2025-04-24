@@ -1,0 +1,50 @@
+resources = {
+	"awscc_dynamodb_table.table_with_pitr_disabled": {
+		"address": "awscc_dynamodb_table.table_with_pitr_disabled",
+		"config": {
+			"attribute_definitions": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"attribute_type": "S",
+					},
+				],
+			},
+			"billing_mode": {
+				"constant_value": "PROVISIONED",
+			},
+			"key_schema": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"key_type":       "HASH",
+					},
+				],
+			},
+			"point_in_time_recovery_specification": {
+				"constant_value": {
+					"point_in_time_recovery_enabled": false,
+				},
+			},
+			"provisioned_throughput": {
+				"constant_value": {
+					"read_capacity_units":  5,
+					"write_capacity_units": 5,
+				},
+			},
+			"table_name": {
+				"constant_value": "example-table",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "table_with_pitr_disabled",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_dynamodb_table",
+	},
+}
+
+module_calls = {}

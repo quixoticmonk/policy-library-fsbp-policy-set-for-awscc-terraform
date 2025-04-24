@@ -1,0 +1,100 @@
+# This policy requires resources of type `awscc_redshift_cluster_parameter_group` to have require_ssl parameter set to true.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+const = {
+	"policy_name": "redshift-cluster-encrypted-in-transit",
+	"message":     "Connections to Amazon Redshift clusters should be encrypted in transit. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-2 for more details.",
+	"address":     "address",
+	"resource_awscc_redshift_cluster_parameter_group": "awscc_redshift_cluster_parameter_group",
+	"config":          "config",
+	"constant_value":  "constant_value",
+	"parameters":      "parameters",
+	"parameter_name":  "parameter_name",
+	"parameter_value": "parameter_value",
+	"require_ssl":     "require_ssl",
+	"true_value":      "true",
+	"module_prefix":   "module.",
+	"module_address":  "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a Redshift cluster parameter group has require_ssl set to true
+has_require_ssl_enabled = func(param_group) {
+	if not (param_group[const.config] is defined) {
+		return false
+	}
+
+	if not (param_group[const.config][const.parameters] is defined) {
+		return false
+	}
+
+	parameters = param_group[const.config][const.parameters][const.constant_value]
+
+	# Look for require_ssl parameter set to true
+	for parameters as parameter {
+		if parameter[const.parameter_name] is const.require_ssl and
+			parameter[const.parameter_value] is const.true_value {
+			return true
+		}
+	}
+
+	return false
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all Redshift cluster parameter group resources
+param_group_resources = config_resources.type(const.resource_awscc_redshift_cluster_parameter_group).resources
+
+# Find violations - Redshift cluster parameter groups without require_ssl=true
+violations = []
+
+for param_group_resources as _, param_group {
+	if not has_require_ssl_enabled(param_group) {
+		append(violations, param_group)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

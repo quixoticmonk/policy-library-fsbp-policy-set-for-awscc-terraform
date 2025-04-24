@@ -1,0 +1,74 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket_policy.policy1": {
+		"address": "awscc_s3_bucket_policy.policy1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			"policy_document": {
+				"constant_value": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyNonSSLRequests\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::my-bucket-1\",\"arn:aws:s3:::my-bucket-1/*\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "policy1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket_policy",
+	},
+	"awscc_s3_bucket_policy.policy2": {
+		"address": "awscc_s3_bucket_policy.policy2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"policy_document": {
+				"constant_value": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"DenyNonSSLRequests\",\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":[\"arn:aws:s3:::my-bucket-2\",\"arn:aws:s3:::my-bucket-2/*\"],\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "policy2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket_policy",
+	},
+}
+
+module_calls = {}

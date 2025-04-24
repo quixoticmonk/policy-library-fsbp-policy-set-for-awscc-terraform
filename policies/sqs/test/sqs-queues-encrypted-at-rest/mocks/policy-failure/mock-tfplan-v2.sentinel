@@ -1,0 +1,55 @@
+terraform_version = "1.5.0"
+
+planned_values = {
+	"outputs": {},
+	"resources": {
+		"awscc_sqs_queue.unencrypted_queue": {
+			"address":        "awscc_sqs_queue.unencrypted_queue",
+			"mode":           "managed",
+			"type":           "awscc_sqs_queue",
+			"name":           "unencrypted_queue",
+			"provider_name":  "registry.terraform.io/hashicorp/awscc",
+			"schema_version": 0,
+			"values": {
+				"delay_seconds":                     90,
+				"maximum_message_size":              2048,
+				"message_retention_period":          86400,
+				"queue_name":                        "unencrypted-queue",
+				"receive_message_wait_time_seconds": 10,
+				"visibility_timeout_seconds":        30,
+			},
+		},
+	},
+}
+
+resource_changes = {
+	"awscc_sqs_queue.unencrypted_queue": {
+		"address":       "awscc_sqs_queue.unencrypted_queue",
+		"mode":          "managed",
+		"type":          "awscc_sqs_queue",
+		"name":          "unencrypted_queue",
+		"provider_name": "registry.terraform.io/hashicorp/awscc",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"before": null,
+			"after": {
+				"delay_seconds":                     90,
+				"maximum_message_size":              2048,
+				"message_retention_period":          86400,
+				"queue_name":                        "unencrypted-queue",
+				"receive_message_wait_time_seconds": 10,
+				"visibility_timeout_seconds":        30,
+			},
+			"after_unknown": {
+				"arn":               true,
+				"id":                true,
+				"kms_master_key_id": true,
+				"queue_url":         true,
+				"tags":              true,
+				"tags_all":          true,
+			},
+		},
+	},
+}

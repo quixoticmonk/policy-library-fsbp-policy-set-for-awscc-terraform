@@ -1,0 +1,72 @@
+resources = {
+	"awscc_dynamodb_table.table_with_backup": {
+		"address": "awscc_dynamodb_table.table_with_backup",
+		"config": {
+			"attribute_definitions": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"attribute_type": "S",
+					},
+				],
+			},
+			"billing_mode": {
+				"constant_value": "PROVISIONED",
+			},
+			"key_schema": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"key_type":       "HASH",
+					},
+				],
+			},
+			"provisioned_throughput": {
+				"constant_value": {
+					"read_capacity_units":  5,
+					"write_capacity_units": 5,
+				},
+			},
+			"table_name": {
+				"constant_value": "example-table",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "table_with_backup",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_dynamodb_table",
+	},
+	"awscc_backup_selection.backup_selection": {
+		"address": "awscc_backup_selection.backup_selection",
+		"config": {
+			"backup_plan_id": {
+				"references": ["awscc_backup_plan.example.id"],
+			},
+			"iam_role_arn": {
+				"references": ["awscc_iam_role.backup_role.arn"],
+			},
+			"selection_name": {
+				"constant_value": "example-backup-selection",
+			},
+			"resources": {
+				"constant_value": [
+					"arn:aws:dynamodb:*:*:table/example-table",
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "backup_selection",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_backup_selection",
+	},
+}
+
+module_calls = {}

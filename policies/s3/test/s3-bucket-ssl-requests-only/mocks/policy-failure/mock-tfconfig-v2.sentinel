@@ -1,0 +1,56 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket_policy.policy1": {
+		"address": "awscc_s3_bucket_policy.policy1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			"policy_document": {
+				"constant_value": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowGetObject\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::my-bucket-1/*\"}]}",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "policy1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket_policy",
+	},
+	// No policy for bucket2
+}
+
+module_calls = {}

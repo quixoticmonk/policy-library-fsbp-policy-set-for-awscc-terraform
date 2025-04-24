@@ -1,0 +1,106 @@
+# This policy requires resources of type `awscc_dynamodb_table` to have auto scaling enabled or use on-demand capacity.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+const = {
+	"policy_name":                   "dynamodb-auto-scaling-enabled",
+	"message":                       "DynamoDB tables should have automatic scaling enabled or use on-demand capacity. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-1 for more details.",
+	"address":                       "address",
+	"resource_awscc_dynamodb_table": "awscc_dynamodb_table",
+	"config":                        "config",
+	"constant_value":                "constant_value",
+	"billing_mode":                  "billing_mode",
+	"provisioned_throughput":        "provisioned_throughput",
+	"read_capacity_auto_scaling":    "read_capacity_auto_scaling",
+	"write_capacity_auto_scaling":   "write_capacity_auto_scaling",
+	"module_prefix":                 "module.",
+	"module_address":                "module_address",
+	"pay_per_request":               "PAY_PER_REQUEST",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a DynamoDB table has auto scaling enabled or uses on-demand capacity
+has_auto_scaling_or_on_demand = func(table) {
+	if not (table[const.config] is defined) {
+		return false
+	}
+
+	# Check if billing mode is PAY_PER_REQUEST (on-demand)
+	if table[const.config][const.billing_mode] is defined {
+		billing_mode_value = table[const.config][const.billing_mode][const.constant_value]
+		if billing_mode_value == const.pay_per_request {
+			return true
+		}
+	}
+
+	# If not on-demand, check for auto scaling configuration
+	has_read_auto_scaling = false
+	has_write_auto_scaling = false
+
+	if table[const.config][const.read_capacity_auto_scaling] is defined {
+		has_read_auto_scaling = true
+	}
+
+	if table[const.config][const.write_capacity_auto_scaling] is defined {
+		has_write_auto_scaling = true
+	}
+
+	return has_read_auto_scaling and has_write_auto_scaling
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all DynamoDB table resources
+table_resources = config_resources.type(const.resource_awscc_dynamodb_table).resources
+
+# Find violations - Tables without auto scaling or on-demand capacity
+violations = []
+
+for table_resources as _, table {
+	if not has_auto_scaling_or_on_demand(table) {
+		append(violations, table)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

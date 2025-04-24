@@ -1,0 +1,72 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			"object_lock_enabled": {
+				"constant_value": true,
+			},
+			"object_lock_configuration": {
+				"object_lock_enabled": {
+					"constant_value": "Enabled",
+				},
+				"rule": {
+					"default_retention": {
+						"mode": {
+							"constant_value": "COMPLIANCE",
+						},
+						"days": {
+							"constant_value": 365,
+						},
+					},
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"object_lock_enabled": {
+				"constant_value": true,
+			},
+			"object_lock_configuration": {
+				"object_lock_enabled": {
+					"constant_value": "Enabled",
+				},
+				"rule": {
+					"default_retention": {
+						"mode": {
+							"constant_value": "GOVERNANCE",
+						},
+						"years": {
+							"constant_value": 1,
+						},
+					},
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

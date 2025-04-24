@@ -1,0 +1,94 @@
+# This policy requires resources of type `awscc_redshift_cluster` to have automatic snapshots enabled.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+const = {
+	"policy_name":                     "redshift-cluster-automatic-snapshots-enabled",
+	"message":                         "Amazon Redshift clusters should have automatic snapshots enabled. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-3 for more details.",
+	"address":                         "address",
+	"resource_awscc_redshift_cluster": "awscc_redshift_cluster",
+	"config":                              "config",
+	"constant_value":                      "constant_value",
+	"automated_snapshot_retention_period": "automated_snapshot_retention_period",
+	"min_retention_period":                1,
+	"module_prefix":                       "module.",
+	"module_address":                      "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a Redshift cluster has automatic snapshots enabled
+has_automatic_snapshots_enabled = func(cluster) {
+	if not (cluster[const.config] is defined) {
+		return true // Default value is 1 if not specified
+	}
+
+	if not (cluster[const.config][const.automated_snapshot_retention_period] is defined) {
+		return true // Default value is 1 if not specified
+	}
+
+	retention_period = cluster[const.config][const.automated_snapshot_retention_period][const.constant_value]
+
+	# Check if retention period is at least the minimum required
+	if retention_period >= const.min_retention_period {
+		return true
+	}
+
+	return false
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all Redshift cluster resources
+redshift_resources = config_resources.type(const.resource_awscc_redshift_cluster).resources
+
+# Find violations - Redshift clusters without automatic snapshots enabled
+violations = []
+
+for redshift_resources as _, cluster {
+	if not has_automatic_snapshots_enabled(cluster) {
+		append(violations, cluster)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

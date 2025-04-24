@@ -1,0 +1,78 @@
+terraform_version = "1.5.0"
+
+planned_values = {
+	"outputs": {},
+	"resources": {
+		"awscc_stepfunctions_state_machine.empty_log_destination": {
+			"address":        "awscc_stepfunctions_state_machine.empty_log_destination",
+			"mode":           "managed",
+			"type":           "awscc_stepfunctions_state_machine",
+			"name":           "empty_log_destination",
+			"provider_name":  "registry.terraform.io/hashicorp/awscc",
+			"schema_version": 0,
+			"values": {
+				"definition": "{\"Comment\":\"A Hello World example of the Amazon States Language using Pass states\",\"StartAt\":\"Hello\",\"States\":{\"Hello\":{\"Type\":\"Pass\",\"Result\":\"Hello\",\"Next\":\"World\"},\"World\":{\"Type\":\"Pass\",\"Result\":\"World\",\"End\":true}}}",
+				"logging_configuration": {
+					"include_execution_data": true,
+					"level":                  "ALL",
+					"log_destination":        "",
+				},
+				"role_arn":           "arn:aws:iam::123456789012:role/service-role/StepFunctions-StateMachine-Role",
+				"state_machine_name": "empty-log-destination-state-machine",
+				"state_machine_type": "STANDARD",
+				"tags": [
+					{
+						"key":   "Name",
+						"value": "empty-log-destination-state-machine",
+					},
+				],
+			},
+		},
+	},
+}
+
+resource_changes = {
+	"awscc_stepfunctions_state_machine.empty_log_destination": {
+		"address":       "awscc_stepfunctions_state_machine.empty_log_destination",
+		"mode":          "managed",
+		"type":          "awscc_stepfunctions_state_machine",
+		"name":          "empty_log_destination",
+		"provider_name": "registry.terraform.io/hashicorp/awscc",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"before": null,
+			"after": {
+				"definition": "{\"Comment\":\"A Hello World example of the Amazon States Language using Pass states\",\"StartAt\":\"Hello\",\"States\":{\"Hello\":{\"Type\":\"Pass\",\"Result\":\"Hello\",\"Next\":\"World\"},\"World\":{\"Type\":\"Pass\",\"Result\":\"World\",\"End\":true}}}",
+				"logging_configuration": {
+					"include_execution_data": true,
+					"level":                  "ALL",
+					"log_destination":        "",
+				},
+				"role_arn":           "arn:aws:iam::123456789012:role/service-role/StepFunctions-StateMachine-Role",
+				"state_machine_name": "empty-log-destination-state-machine",
+				"state_machine_type": "STANDARD",
+				"tags": [
+					{
+						"key":   "Name",
+						"value": "empty-log-destination-state-machine",
+					},
+				],
+			},
+			"after_unknown": {
+				"arn":           true,
+				"creation_date": true,
+				"id":            true,
+				"logging_configuration": {
+					"destinations": true,
+				},
+				"status": true,
+				"tags": [
+					{},
+				],
+				"tags_all": true,
+			},
+		},
+	},
+}

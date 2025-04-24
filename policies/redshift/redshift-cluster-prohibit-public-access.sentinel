@@ -1,0 +1,94 @@
+# This policy requires resources of type `awscc_redshift_cluster` to prohibit public access.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+const = {
+	"policy_name":                     "redshift-cluster-prohibit-public-access",
+	"message":                         "Amazon Redshift clusters should prohibit public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-1 for more details.",
+	"address":                         "address",
+	"resource_awscc_redshift_cluster": "awscc_redshift_cluster",
+	"config":              "config",
+	"constant_value":      "constant_value",
+	"publicly_accessible": "publicly_accessible",
+	"module_prefix":       "module.",
+	"module_address":      "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a Redshift cluster prohibits public access
+prohibits_public_access = func(cluster) {
+	if not (cluster[const.config] is defined) {
+		return false
+	}
+
+	if not (cluster[const.config][const.publicly_accessible] is defined) {
+		# If publicly_accessible is not defined, it defaults to false in AWS
+		return true
+	}
+
+	publicly_accessible_value = cluster[const.config][const.publicly_accessible][const.constant_value]
+
+	# Check if public access is prohibited
+	if publicly_accessible_value is false {
+		return true
+	}
+
+	return false
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all Redshift cluster resources
+redshift_resources = config_resources.type(const.resource_awscc_redshift_cluster).resources
+
+# Find violations - Redshift clusters with public access
+violations = []
+
+for redshift_resources as _, cluster {
+	if not prohibits_public_access(cluster) {
+		append(violations, cluster)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

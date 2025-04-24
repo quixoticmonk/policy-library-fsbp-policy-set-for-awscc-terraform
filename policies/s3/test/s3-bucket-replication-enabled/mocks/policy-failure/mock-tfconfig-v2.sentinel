@@ -1,0 +1,98 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			// No replication_configuration
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"replication_configuration": {
+				"role": {
+					"constant_value": "arn:aws:iam::123456789012:role/replication-role",
+				},
+				// No rules
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket3": {
+		"address": "awscc_s3_bucket.bucket3",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-3",
+			},
+			"replication_configuration": {
+				"role": {
+					"constant_value": "arn:aws:iam::123456789012:role/replication-role",
+				},
+				"rules": [], // Empty rules array
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket3",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket4": {
+		"address": "awscc_s3_bucket.bucket4",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-4",
+			},
+			"replication_configuration": {
+				"role": {
+					"constant_value": "arn:aws:iam::123456789012:role/replication-role",
+				},
+				"rules": [
+					{
+						"destination": {
+							"bucket": {
+								"constant_value": "arn:aws:s3:::destination-bucket",
+							},
+						},
+						"status": {
+							"constant_value": "Disabled", // All rules are disabled
+						},
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket4",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

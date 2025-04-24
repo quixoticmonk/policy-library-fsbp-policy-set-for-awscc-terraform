@@ -1,0 +1,45 @@
+resources = {
+	"awscc_dynamodb_table.table_without_backup": {
+		"address": "awscc_dynamodb_table.table_without_backup",
+		"config": {
+			"attribute_definitions": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"attribute_type": "S",
+					},
+				],
+			},
+			"billing_mode": {
+				"constant_value": "PROVISIONED",
+			},
+			"key_schema": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"key_type":       "HASH",
+					},
+				],
+			},
+			"provisioned_throughput": {
+				"constant_value": {
+					"read_capacity_units":  5,
+					"write_capacity_units": 5,
+				},
+			},
+			"table_name": {
+				"constant_value": "example-table",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "table_without_backup",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_dynamodb_table",
+	},
+}
+
+module_calls = {}

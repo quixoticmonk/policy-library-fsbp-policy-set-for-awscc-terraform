@@ -1,0 +1,51 @@
+# Policy that requires Neptune DB clusters to be configured to copy tags to snapshots
+# This policy validates that all Neptune DB clusters have CopyTagsToSnapshot set to true
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_neptune_db_cluster": "awscc_neptune_db_cluster",
+	"copy_tags_to_snapshot":             "copy_tags_to_snapshot",
+	"constant_value":                    "constant_value",
+}
+
+# Get all Neptune DB clusters
+allNeptuneDBClusters = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_neptune_db_cluster
+}
+
+# Find violations - Neptune DB clusters that don't have copy tags to snapshot enabled
+violations = []
+
+for allNeptuneDBClusters as address, cluster {
+	cluster_config = cluster.config
+
+	# Check if copy_tags_to_snapshot is set to true
+	if cluster_config[const.copy_tags_to_snapshot] else null is null {
+		append(violations, cluster)
+	} else {
+		copy_tags_config = cluster_config[const.copy_tags_to_snapshot]
+
+		if copy_tags_config.constant_value is not true {
+			append(violations, cluster)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("Neptune DB clusters not configured to copy tags to snapshots:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Main rule
+main = rule {
+	length(violations) is 0
+}

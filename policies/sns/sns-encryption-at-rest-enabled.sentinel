@@ -6,8 +6,6 @@
 # Imports
 
 import "tfconfig/v2" as tfconfig
-import "tfresources" as tf
-import "report" as report
 import "strings"
 
 # Constants
@@ -15,88 +13,43 @@ import "strings"
 const = {
 	"policy_name":              "sns-encryption-at-rest-enabled",
 	"message":                  "SNS topics should be encrypted at rest using AWS KMS. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-sns-1 for more details.",
-	"address":                  "address",
 	"resource_awscc_sns_topic": "awscc_sns_topic",
-	"config":                   "config",
-	"constant_value":           "constant_value",
 	"kms_master_key_id":        "kms_master_key_id",
-	"module_prefix":            "module.",
-	"module_address":           "module_address",
+	"constant_value":           "constant_value",
 }
-
-# Functions
-
-# Removes module address prefix from a resource
-# and returns back the localized address for a module.
-resource_address_without_module_address = func(res) {
-	resource_addr = res[const.address]
-
-	# Check for root module
-	if not strings.has_prefix(resource_addr, const.module_prefix) {
-		return resource_addr
-	}
-
-	module_addr_prefix = res[const.module_address] + "."
-	return strings.trim_prefix(resource_addr, module_addr_prefix)
-}
-
-# Check if an SNS topic has encryption at rest enabled
-has_encryption_at_rest = func(topic) {
-	if not (topic[const.config] is defined) {
-		return false
-	}
-
-	if not (topic[const.config][const.kms_master_key_id] is defined) {
-		return false
-	}
-
-	kms_key_attr = topic[const.config][const.kms_master_key_id]
-
-	# Check if KMS key ID is set (not empty)
-	if not (kms_key_attr[const.constant_value] is defined) {
-		return false
-	}
-
-	if kms_key_attr[const.constant_value] is "" {
-		return false
-	}
-
-	return true
-}
-
-# Variables
-
-config_resources = tf.config(tfconfig.resources)
 
 # Get all SNS topic resources
-topic_resources = config_resources.type(const.resource_awscc_sns_topic).resources
+allSNSTopics = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_sns_topic
+}
 
 # Find violations - SNS topics without encryption at rest
 violations = []
 
-for topic_resources as _, topic {
-	if not has_encryption_at_rest(topic) {
+for allSNSTopics as address, topic {
+	topic_config = topic.config
+
+	# Check if KMS master key ID is set
+	if topic_config[const.kms_master_key_id] else null is null {
 		append(violations, topic)
+	} else {
+		# Check if KMS key ID is not empty
+		kms_key_attr = topic_config[const.kms_master_key_id]
+		if kms_key_attr[const.constant_value] else "" is "" {
+			append(violations, topic)
+		}
 	}
 }
 
-summary = {
-	"policy_name": const.policy_name,
-	"violations": map violations as _, v {
-		{
-			"address":        v.address,
-			"module_address": v.module_address,
-			"message":        const.message,
-		}
-	},
+# Print violations for debugging
+if length(violations) > 0 {
+	print("SNS topics without encryption at rest enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
 }
 
-# Outputs
-
-print(report.generate_policy_report(summary))
-
 # Rules
-
 main = rule {
-	violations is empty
+	length(violations) is 0
 }

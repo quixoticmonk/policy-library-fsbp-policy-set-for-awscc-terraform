@@ -1,0 +1,39 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_stepfunctions_state_machine.no_logging": {
+		"address": "awscc_stepfunctions_state_machine.no_logging",
+		"config": {
+			"definition": {
+				"constant_value": "{\"Comment\":\"A Hello World example of the Amazon States Language using Pass states\",\"StartAt\":\"Hello\",\"States\":{\"Hello\":{\"Type\":\"Pass\",\"Result\":\"Hello\",\"Next\":\"World\"},\"World\":{\"Type\":\"Pass\",\"Result\":\"World\",\"End\":true}}}",
+			},
+			"role_arn": {
+				"constant_value": "arn:aws:iam::123456789012:role/service-role/StepFunctions-StateMachine-Role",
+			},
+			"state_machine_name": {
+				"constant_value": "no-logging-state-machine",
+			},
+			"state_machine_type": {
+				"constant_value": "STANDARD",
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "no-logging-state-machine",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "no_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_stepfunctions_state_machine",
+	},
+}

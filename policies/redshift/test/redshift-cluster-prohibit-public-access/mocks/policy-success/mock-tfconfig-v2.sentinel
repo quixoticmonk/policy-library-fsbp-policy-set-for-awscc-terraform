@@ -1,0 +1,35 @@
+resources = {
+	"awscc_redshift_cluster.private_cluster": {
+		"address": "awscc_redshift_cluster.private_cluster",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "private-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			"publicly_accessible": {
+				"constant_value": false,
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "private_cluster",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+}
+
+module_calls = {}

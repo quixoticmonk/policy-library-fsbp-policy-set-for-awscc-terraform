@@ -1,0 +1,79 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ssm_document.private_document": {
+		"address": "awscc_ssm_document.private_document",
+		"config": {
+			"content": {
+				"constant_value": "{\n  \"schemaVersion\": \"1.2\",\n  \"description\": \"Check ip configuration of a Linux instance.\",\n  \"parameters\": {},\n  \"runtimeConfig\": {\n    \"aws:runShellScript\": {\n      \"properties\": [\n        {\n          \"id\": \"0.aws:runShellScript\",\n          \"runCommand\": [\"ifconfig\"]\n        }\n      ]\n    }\n  }\n}",
+			},
+			"document_format": {
+				"constant_value": "JSON",
+			},
+			"document_type": {
+				"constant_value": "Command",
+			},
+			"name": {
+				"constant_value": "private-document",
+			},
+			"permissions": {
+				"constant_value": {
+					"account_ids": ["123456789012", "987654321098"],
+					"type":        "Share",
+				},
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "private-document",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "private_document",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_document",
+	},
+	"awscc_ssm_document.no_permissions_document": {
+		"address": "awscc_ssm_document.no_permissions_document",
+		"config": {
+			"content": {
+				"constant_value": "{\n  \"schemaVersion\": \"1.2\",\n  \"description\": \"Check ip configuration of a Linux instance.\",\n  \"parameters\": {},\n  \"runtimeConfig\": {\n    \"aws:runShellScript\": {\n      \"properties\": [\n        {\n          \"id\": \"0.aws:runShellScript\",\n          \"runCommand\": [\"ifconfig\"]\n        }\n      ]\n    }\n  }\n}",
+			},
+			"document_format": {
+				"constant_value": "JSON",
+			},
+			"document_type": {
+				"constant_value": "Command",
+			},
+			"name": {
+				"constant_value": "no-permissions-document",
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "no-permissions-document",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "no_permissions_document",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_document",
+	},
+}

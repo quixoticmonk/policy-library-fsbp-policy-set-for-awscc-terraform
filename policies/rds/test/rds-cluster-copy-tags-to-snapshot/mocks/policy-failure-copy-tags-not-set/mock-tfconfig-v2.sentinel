@@ -1,0 +1,30 @@
+resources = {
+	"awscc_rds_db_cluster.cluster1": {
+		"address": "awscc_rds_db_cluster.cluster1",
+		"config": {
+			"engine": {
+				"constant_value": "aurora-postgresql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"db_cluster_identifier": {
+				"constant_value": "my-postgres-cluster",
+			},
+			// copy_tags_to_snapshot not set
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cluster1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_cluster",
+	},
+}
+
+module_calls = {}

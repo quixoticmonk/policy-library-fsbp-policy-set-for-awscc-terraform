@@ -1,0 +1,51 @@
+# Policy that requires Neptune DB cluster snapshots to be encrypted at rest
+# This policy validates that all Neptune DB cluster snapshots are encrypted
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_neptune_db_cluster_snapshot": "awscc_neptune_db_cluster_snapshot",
+	"storage_encrypted":                          "storage_encrypted",
+	"constant_value":                             "constant_value",
+}
+
+# Get all Neptune DB cluster snapshots
+allNeptuneDBClusterSnapshots = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_neptune_db_cluster_snapshot
+}
+
+# Find violations - Neptune DB cluster snapshots that are not encrypted
+violations = []
+
+for allNeptuneDBClusterSnapshots as address, snapshot {
+	snapshot_config = snapshot.config
+
+	# Check if storage_encrypted is set to true
+	if snapshot_config[const.storage_encrypted] else null is null {
+		append(violations, snapshot)
+	} else {
+		storage_encrypted_config = snapshot_config[const.storage_encrypted]
+
+		if storage_encrypted_config.constant_value is not true {
+			append(violations, snapshot)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("Neptune DB cluster snapshots not encrypted at rest:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Main rule
+main = rule {
+	length(violations) is 0
+}

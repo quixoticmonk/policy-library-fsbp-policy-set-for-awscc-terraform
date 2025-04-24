@@ -1,0 +1,39 @@
+resources = {
+	"awscc_redshift_cluster.logging_enabled": {
+		"address": "awscc_redshift_cluster.logging_enabled",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "logging-enabled-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			"logging_properties": {
+				"constant_value": {
+					"bucket_name":   "redshift-logs-bucket",
+					"s3_key_prefix": "redshift-logs/",
+					"log_exports":   ["connectionlog", "userlog", "useractivitylog"],
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "logging_enabled",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+}
+
+module_calls = {}

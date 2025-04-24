@@ -1,0 +1,59 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			"bucket_encryption": {
+				"server_side_encryption_configuration": {
+					"constant_value": [
+						{
+							"server_side_encryption_by_default": {
+								"sse_algorithm": "AES256",
+							},
+						},
+					],
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"bucket_encryption": {
+				"server_side_encryption_configuration": {
+					"constant_value": [
+						{
+							"server_side_encryption_by_default": {
+								"sse_algorithm":     "aws:kms",
+								"kms_master_key_id": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-a123-456a-a12b-a123b4cd56ef",
+							},
+						},
+					],
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

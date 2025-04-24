@@ -1,0 +1,31 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_rds_db_cluster.cluster_with_deletion_protection": {
+		"address": "awscc_rds_db_cluster.cluster_with_deletion_protection",
+		"config": {
+			"engine": {
+				"constant_value": "aurora-mysql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"deletion_protection": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "cluster_with_deletion_protection",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_cluster",
+	},
+}

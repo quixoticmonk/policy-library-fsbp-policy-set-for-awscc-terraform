@@ -1,0 +1,45 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ssm_document.public_document": {
+		"address": "awscc_ssm_document.public_document",
+		"config": {
+			"content": {
+				"constant_value": "{\n  \"schemaVersion\": \"1.2\",\n  \"description\": \"Check ip configuration of a Linux instance.\",\n  \"parameters\": {},\n  \"runtimeConfig\": {\n    \"aws:runShellScript\": {\n      \"properties\": [\n        {\n          \"id\": \"0.aws:runShellScript\",\n          \"runCommand\": [\"ifconfig\"]\n        }\n      ]\n    }\n  }\n}",
+			},
+			"document_format": {
+				"constant_value": "JSON",
+			},
+			"document_type": {
+				"constant_value": "Command",
+			},
+			"name": {
+				"constant_value": "public-document",
+			},
+			"permissions": {
+				"constant_value": {
+					"account_ids": ["all"],
+					"type":        "Share",
+				},
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "public-document",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "public_document",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ssm_document",
+	},
+}

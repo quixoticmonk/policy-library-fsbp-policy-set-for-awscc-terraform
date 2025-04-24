@@ -1,0 +1,68 @@
+resources = {
+	"awscc_redshift_cluster.no_logging": {
+		"address": "awscc_redshift_cluster.no_logging",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "no-logging-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			# No logging_properties specified
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "no_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+	"awscc_redshift_cluster.partial_logging": {
+		"address": "awscc_redshift_cluster.partial_logging",
+		"config": {
+			"cluster_identifier": {
+				"constant_value": "partial-logging-cluster",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "Password123!",
+			},
+			"node_type": {
+				"constant_value": "dc2.large",
+			},
+			"number_of_nodes": {
+				"constant_value": 2,
+			},
+			"logging_properties": {
+				"constant_value": {
+					"bucket_name":   "redshift-logs-bucket",
+					"s3_key_prefix": "redshift-logs/",
+					"log_exports":   ["connectionlog"], # Missing userlog and useractivitylog
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "partial_logging",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_redshift_cluster",
+	},
+}
+
+module_calls = {}

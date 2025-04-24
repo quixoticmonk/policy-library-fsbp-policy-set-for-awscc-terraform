@@ -1,0 +1,54 @@
+# TITLE: StepFunctions.1 Step Functions state machines should have logging turned on
+# DESCRIPTION: This policy ensures that AWS Step Functions state machines have logging enabled.
+# RESOURCE: awscc_stepfunctions_state_machine
+
+# Import tfconfig/v2 as tfconfig
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_stepfunctions_state_machine": "awscc_stepfunctions_state_machine",
+	"logging_configuration":                      "logging_configuration",
+	"constant_value":                             "constant_value",
+	"log_destination":                            "log_destination",
+}
+
+# Get all Step Functions state machines
+allStateMachines = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_stepfunctions_state_machine
+}
+
+# Filter to Step Functions state machines that don't have logging enabled
+# Step Functions state machines should have logging_configuration defined with log_destination
+violatingStateMachines = []
+
+for allStateMachines as address, machine {
+	machine_config = machine.config
+
+	# Check if logging_configuration is set
+	if machine_config[const.logging_configuration] else null is null {
+		append(violatingStateMachines, machine)
+	} else {
+		# Check if log_destination is set and not empty
+		logging_config = machine_config[const.logging_configuration][const.constant_value]
+		if logging_config[const.log_destination] is null or logging_config[const.log_destination] is "" {
+			append(violatingStateMachines, machine)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violatingStateMachines) > 0 {
+	print("Step Functions state machines without logging enabled:")
+	for violatingStateMachines as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Count violations
+violations = length(violatingStateMachines)
+
+# Main rule
+main = rule {
+	violations is 0
+}

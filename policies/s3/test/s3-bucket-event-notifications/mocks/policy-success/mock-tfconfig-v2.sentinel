@@ -1,0 +1,88 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			"notification_configuration": {
+				"lambda_function_configurations": [
+					{
+						"lambda_function_arn": {
+							"constant_value": "arn:aws:lambda:us-east-1:123456789012:function:my-function",
+						},
+						"events": {
+							"constant_value": ["s3:ObjectCreated:*"],
+						},
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"notification_configuration": {
+				"topic_configurations": [
+					{
+						"topic_arn": {
+							"constant_value": "arn:aws:sns:us-east-1:123456789012:my-topic",
+						},
+						"events": {
+							"constant_value": ["s3:ObjectRemoved:*"],
+						},
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket3": {
+		"address": "awscc_s3_bucket.bucket3",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-3",
+			},
+			"notification_configuration": {
+				"queue_configurations": [
+					{
+						"queue_arn": {
+							"constant_value": "arn:aws:sqs:us-east-1:123456789012:my-queue",
+						},
+						"events": {
+							"constant_value": ["s3:ObjectCreated:Put"],
+						},
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket3",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

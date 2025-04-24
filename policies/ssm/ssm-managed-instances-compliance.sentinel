@@ -1,0 +1,72 @@
+# TITLE: SSM.2 EC2 instances managed by Systems Manager should have a patch compliance status of COMPLIANT after a patch installation
+# DESCRIPTION: This policy ensures that EC2 instances managed by AWS Systems Manager have a patch compliance status of COMPLIANT after a patch installation.
+# RESOURCE: awscc_ssm_patch_baseline
+
+# Import tfconfig/v2 as tfconfig
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_ssm_patch_baseline": "awscc_ssm_patch_baseline",
+	"approval_rules":                    "approval_rules",
+	"constant_value":                    "constant_value",
+	"patch_rules":                       "patch_rules",
+	"approve_after_days":                "approve_after_days",
+	"compliance_level":                  "compliance_level",
+	"compliant_levels":                  ["CRITICAL", "HIGH"],
+}
+
+# Get all SSM patch baselines
+allPatchBaselines = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_ssm_patch_baseline
+}
+
+# Filter to SSM patch baselines that don't have proper compliance settings
+violatingPatchBaselines = []
+
+for allPatchBaselines as address, baseline {
+	baseline_config = baseline.config
+
+	# Check if approval_rules is set
+	if baseline_config[const.approval_rules] else null is null {
+		append(violatingPatchBaselines, baseline)
+	} else {
+		approval_rules = baseline_config[const.approval_rules][const.constant_value]
+
+		# Check if patch_rules is set
+		if approval_rules[const.patch_rules] else null is null {
+			append(violatingPatchBaselines, baseline)
+		} else {
+			patch_rules = approval_rules[const.patch_rules]
+
+			# Check if any patch rule has a compliance level of CRITICAL or HIGH
+			has_critical_or_high = false
+
+			for patch_rules as _, patchRule {
+				if patchRule[const.compliance_level] else "" in const.compliant_levels {
+					has_critical_or_high = true
+				}
+			}
+
+			if not has_critical_or_high {
+				append(violatingPatchBaselines, baseline)
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violatingPatchBaselines) > 0 {
+	print("SSM patch baselines without proper compliance settings:")
+	for violatingPatchBaselines as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Count violations
+violations = length(violatingPatchBaselines)
+
+# Main rule
+main = rule {
+	violations is 0
+}

@@ -1,0 +1,39 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+resources = {
+	"awscc_ec2_instance.managed_instance": {
+		"address": "awscc_ec2_instance.managed_instance",
+		"config": {
+			"instance_type": {
+				"constant_value": "t3.micro",
+			},
+			"image_id": {
+				"constant_value": "ami-0c55b159cbfafe1f0",
+			},
+			"subnet_id": {
+				"constant_value": "subnet-0123456789abcdef0",
+			},
+			"iam_instance_profile": {
+				"constant_value": "SSMInstanceProfile",
+			},
+			"tags": {
+				"constant_value": [
+					{
+						"key":   "Name",
+						"value": "managed-instance",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"depends_on":          [],
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "managed_instance",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_ec2_instance",
+	},
+}

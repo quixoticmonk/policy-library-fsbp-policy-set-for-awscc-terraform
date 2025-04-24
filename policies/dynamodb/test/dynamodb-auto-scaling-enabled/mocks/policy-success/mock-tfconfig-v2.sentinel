@@ -1,0 +1,39 @@
+resources = {
+	"awscc_dynamodb_table.test_table": {
+		"address": "awscc_dynamodb_table.test_table",
+		"config": {
+			"table_name": {
+				"constant_value": "test-table",
+			},
+			"billing_mode": {
+				"constant_value": "PAY_PER_REQUEST",
+			},
+			"attribute_definitions": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"attribute_type": "S",
+					},
+				],
+			},
+			"key_schema": {
+				"constant_value": [
+					{
+						"attribute_name": "id",
+						"key_type":       "HASH",
+					},
+				],
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "test_table",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_dynamodb_table",
+	},
+}
+
+module_calls = {}

@@ -1,0 +1,100 @@
+# This policy requires resources of type `awscc_dynamodb_table` to have point-in-time recovery enabled.
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "strings"
+
+# Constants
+const = {
+	"policy_name":                          "dynamodb-point-in-time-recovery-enabled",
+	"message":                              "DynamoDB tables should have point-in-time recovery enabled. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-2 for more details.",
+	"address":                              "address",
+	"resource_awscc_dynamodb_table":        "awscc_dynamodb_table",
+	"config":                               "config",
+	"constant_value":                       "constant_value",
+	"point_in_time_recovery_specification": "point_in_time_recovery_specification",
+	"point_in_time_recovery_enabled":       "point_in_time_recovery_enabled",
+	"module_prefix":                        "module.",
+	"module_address":                       "module_address",
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Check if a DynamoDB table has point-in-time recovery enabled
+has_point_in_time_recovery_enabled = func(table) {
+	if not (table[const.config] is defined) {
+		return false
+	}
+
+	if not (table[const.config][const.point_in_time_recovery_specification] is defined) {
+		return false
+	}
+
+	pitr_spec = table[const.config][const.point_in_time_recovery_specification]
+
+	if not (pitr_spec[const.constant_value] is defined) {
+		return false
+	}
+
+	pitr_spec_value = pitr_spec[const.constant_value]
+
+	if not (pitr_spec_value[const.point_in_time_recovery_enabled] is defined) {
+		return false
+	}
+
+	# Check if point_in_time_recovery_enabled is set to true
+	return pitr_spec_value[const.point_in_time_recovery_enabled] is true
+}
+
+# Variables
+config_resources = tf.config(tfconfig.resources)
+
+# Get all DynamoDB table resources
+table_resources = config_resources.type(const.resource_awscc_dynamodb_table).resources
+
+# Find violations - Tables without point-in-time recovery enabled
+violations = []
+
+for table_resources as _, table {
+	if not has_point_in_time_recovery_enabled(table) {
+		append(violations, table)
+	}
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+print(report.generate_policy_report(summary))
+
+# Rules
+main = rule {
+	violations is empty
+}

@@ -1,0 +1,63 @@
+# Policy that requires Neptune DB clusters to publish audit logs to CloudWatch Logs
+# This policy validates that all Neptune DB clusters have EnableCloudwatchLogsExports configured with "audit"
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_neptune_db_cluster": "awscc_neptune_db_cluster",
+	"enable_cloudwatch_logs_exports":    "enable_cloudwatch_logs_exports",
+	"constant_value":                    "constant_value",
+	"required_log_type":                 "audit",
+}
+
+# Get all Neptune DB clusters
+allNeptuneDBClusters = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_neptune_db_cluster
+}
+
+# Find violations - Neptune DB clusters that don't have audit logging enabled
+violations = []
+
+for allNeptuneDBClusters as address, cluster {
+	cluster_config = cluster.config
+
+	# Check if enable_cloudwatch_logs_exports includes "audit"
+	if cluster_config[const.enable_cloudwatch_logs_exports] else null is null {
+		append(violations, cluster)
+	} else {
+		logs_config = cluster_config[const.enable_cloudwatch_logs_exports]
+
+		# Check if the logs config contains the required log type
+		has_audit_log = false
+
+		if logs_config.constant_value is not null {
+			for logs_config.constant_value as log_type {
+				if log_type is const.required_log_type {
+					has_audit_log = true
+				}
+			}
+		}
+
+		if not has_audit_log {
+			append(violations, cluster)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("Neptune DB clusters without audit logging enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Main rule
+main = rule {
+	length(violations) is 0
+}

@@ -1,0 +1,59 @@
+# This policy requires S3 buckets to be configured to use Object Lock
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket":  "awscc_s3_bucket",
+	"object_lock_enabled":       "object_lock_enabled",
+	"object_lock_configuration": "object_lock_configuration",
+	"constant_value":            "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets without Object Lock enabled
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if object_lock_enabled is set to true
+	has_object_lock_enabled = false
+	if bucket_config[const.object_lock_enabled] else null is not null {
+		if bucket_config[const.object_lock_enabled][const.constant_value] is true {
+			has_object_lock_enabled = true
+		}
+	}
+
+	# Check if object_lock_configuration is set
+	has_object_lock_configuration = false
+	if bucket_config[const.object_lock_configuration] else null is not null {
+		has_object_lock_configuration = true
+	}
+
+	# Bucket should have both object_lock_enabled and object_lock_configuration
+	if not (has_object_lock_enabled and has_object_lock_configuration) {
+		append(violations, bucket)
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets without Object Lock enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

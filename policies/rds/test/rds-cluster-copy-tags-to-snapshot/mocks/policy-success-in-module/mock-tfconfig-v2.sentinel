@@ -1,0 +1,42 @@
+resources = {
+	"module.rds.awscc_rds_db_cluster.cluster1": {
+		"address": "module.rds.awscc_rds_db_cluster.cluster1",
+		"config": {
+			"engine": {
+				"constant_value": "aurora-mysql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"db_cluster_identifier": {
+				"constant_value": "my-aurora-cluster",
+			},
+			"copy_tags_to_snapshot": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "module.rds",
+		"name":                "cluster1",
+		"provider_config_key": "module.rds:awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_cluster",
+	},
+}
+
+module_calls = {
+	"module.rds": {
+		"config":             {},
+		"count":              {},
+		"for_each":           {},
+		"module_address":     "",
+		"name":               "rds",
+		"source":             "./modules/rds",
+		"version_constraint": "",
+	},
+}

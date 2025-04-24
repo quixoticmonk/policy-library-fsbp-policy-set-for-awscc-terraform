@@ -1,0 +1,21 @@
+resources = {
+	"awscc_sqs_queue.empty_key_queue": {
+		"address": "awscc_sqs_queue.empty_key_queue",
+		"config": {
+			"queue_name": {
+				"constant_value": "empty-key-queue",
+			},
+			"kms_master_key_id": {
+				"constant_value": "",
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "empty_key_queue",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_sqs_queue",
+	},
+}

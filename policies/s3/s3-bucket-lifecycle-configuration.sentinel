@@ -1,0 +1,71 @@
+# This policy requires S3 buckets with versioning enabled to have lifecycle configurations
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket": "awscc_s3_bucket",
+	"versioning":               "versioning",
+	"status":                   "status",
+	"lifecycle_configuration":  "lifecycle_configuration",
+	"rules":                    "rules",
+	"constant_value":           "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets with versioning enabled but without lifecycle configurations
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if versioning is enabled
+	has_versioning_enabled = false
+	if bucket_config[const.versioning] else null is not null {
+		versioning = bucket_config[const.versioning]
+		if versioning[const.status] else null is not null {
+			status = versioning[const.status][const.constant_value]
+			if status is "Enabled" {
+				has_versioning_enabled = true
+			}
+		}
+	}
+
+	# If versioning is enabled, check for lifecycle configuration
+	if has_versioning_enabled {
+		if bucket_config[const.lifecycle_configuration] else null is null {
+			append(violations, bucket)
+		} else {
+			lifecycle_config = bucket_config[const.lifecycle_configuration]
+			if lifecycle_config[const.rules] else null is null {
+				append(violations, bucket)
+			} else {
+				rules = lifecycle_config[const.rules]
+				if length(rules) is 0 {
+					append(violations, bucket)
+				}
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets with versioning enabled but without lifecycle configurations:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

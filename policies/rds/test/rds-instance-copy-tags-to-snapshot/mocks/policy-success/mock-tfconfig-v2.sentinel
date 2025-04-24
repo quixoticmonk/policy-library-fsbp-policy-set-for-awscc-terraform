@@ -1,0 +1,60 @@
+resources = {
+	"awscc_rds_db_instance.instance1": {
+		"address": "awscc_rds_db_instance.instance1",
+		"config": {
+			"engine": {
+				"constant_value": "mysql",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"db_instance_identifier": {
+				"constant_value": "my-mysql-instance",
+			},
+			"copy_tags_to_snapshot": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "instance1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_instance",
+	},
+	"awscc_rds_db_instance.instance2": {
+		"address": "awscc_rds_db_instance.instance2",
+		"config": {
+			"engine": {
+				"constant_value": "postgres",
+			},
+			"master_username": {
+				"constant_value": "admin",
+			},
+			"master_user_password": {
+				"constant_value": "password123",
+			},
+			"db_instance_identifier": {
+				"constant_value": "my-postgres-instance",
+			},
+			"copy_tags_to_snapshot": {
+				"constant_value": true,
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "instance2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_rds_db_instance",
+	},
+}
+
+module_calls = {}

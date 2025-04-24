@@ -1,0 +1,64 @@
+resources = {
+	"awscc_s3_bucket.bucket1": {
+		"address": "awscc_s3_bucket.bucket1",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-1",
+			},
+			"public_access_block_configuration": {
+				"block_public_acls": {
+					"constant_value": true,
+				},
+				"block_public_policy": {
+					"constant_value": true,
+				},
+				"ignore_public_acls": {
+					"constant_value": true,
+				},
+				"restrict_public_buckets": {
+					"constant_value": true,
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket1",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+	"awscc_s3_bucket.bucket2": {
+		"address": "awscc_s3_bucket.bucket2",
+		"config": {
+			"bucket": {
+				"constant_value": "my-bucket-2",
+			},
+			"public_access_block_configuration": {
+				"block_public_acls": {
+					"constant_value": true,
+				},
+				"block_public_policy": {
+					"constant_value": true,
+				},
+				"ignore_public_acls": {
+					"constant_value": true,
+				},
+				"restrict_public_buckets": {
+					"constant_value": true,
+				},
+			},
+		},
+		"count":               {},
+		"for_each":            {},
+		"mode":                "managed",
+		"module_address":      "",
+		"name":                "bucket2",
+		"provider_config_key": "awscc",
+		"provisioners":        [],
+		"type":                "awscc_s3_bucket",
+	},
+}
+
+module_calls = {}

@@ -1,0 +1,85 @@
+# This policy requires S3 buckets to be encrypted with AWS KMS
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket":             "awscc_s3_bucket",
+	"bucket_encryption":                    "bucket_encryption",
+	"server_side_encryption_configuration": "server_side_encryption_configuration",
+	"server_side_encryption_by_default":    "server_side_encryption_by_default",
+	"sse_algorithm":                        "sse_algorithm",
+	"kms_master_key_id":                    "kms_master_key_id",
+	"constant_value":                       "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets not encrypted with AWS KMS
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if bucket_encryption is set
+	if bucket_config[const.bucket_encryption] else null is null {
+		append(violations, bucket)
+	} else {
+		bucket_encryption = bucket_config[const.bucket_encryption]
+
+		# Check if server_side_encryption_configuration is set
+		if bucket_encryption[const.server_side_encryption_configuration] else null is null {
+			append(violations, bucket)
+		} else {
+			sse_config = bucket_encryption[const.server_side_encryption_configuration]
+
+			# Check if the configuration is an array with at least one element
+			if length(sse_config) < 1 {
+				append(violations, bucket)
+			} else {
+				sse_default = sse_config[0][const.server_side_encryption_by_default]
+
+				# Check if server_side_encryption_by_default is set
+				if sse_default else null is null {
+					append(violations, bucket)
+				} else {
+					# Check if SSE algorithm is AWS-KMS
+					if sse_default[const.sse_algorithm] else null is null {
+						append(violations, bucket)
+					} else {
+						algorithm = sse_default[const.sse_algorithm][const.constant_value]
+
+						if algorithm is not "aws:kms" {
+							append(violations, bucket)
+						} else {
+							# Check if KMS key ID is specified
+							if sse_default[const.kms_master_key_id] else null is null {
+								append(violations, bucket)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets not encrypted with AWS KMS:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

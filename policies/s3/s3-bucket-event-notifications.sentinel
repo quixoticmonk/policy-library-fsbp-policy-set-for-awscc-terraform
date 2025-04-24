@@ -1,0 +1,74 @@
+# This policy requires S3 buckets to have event notifications enabled
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket":   "awscc_s3_bucket",
+	"notification_configuration": "notification_configuration",
+	"constant_value":             "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets without event notifications enabled
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if notification_configuration is set
+	if bucket_config[const.notification_configuration] else null is null {
+		append(violations, bucket)
+	} else {
+		notification_config = bucket_config[const.notification_configuration]
+
+		# Check if at least one notification type is configured
+		has_notifications = false
+
+		if notification_config["lambda_function_configurations"] else null is not null {
+			lambda_configs = notification_config["lambda_function_configurations"]
+			if length(lambda_configs) > 0 {
+				has_notifications = true
+			}
+		}
+
+		if notification_config["queue_configurations"] else null is not null {
+			queue_configs = notification_config["queue_configurations"]
+			if length(queue_configs) > 0 {
+				has_notifications = true
+			}
+		}
+
+		if notification_config["topic_configurations"] else null is not null {
+			topic_configs = notification_config["topic_configurations"]
+			if length(topic_configs) > 0 {
+				has_notifications = true
+			}
+		}
+
+		if not has_notifications {
+			append(violations, bucket)
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets without event notifications enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}

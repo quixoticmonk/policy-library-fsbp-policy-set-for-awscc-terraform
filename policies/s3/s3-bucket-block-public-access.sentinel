@@ -1,0 +1,70 @@
+# This policy requires S3 buckets to have Block Public Access settings enabled
+
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+import "tfconfig/v2" as tfconfig
+
+# Constants
+const = {
+	"resource_awscc_s3_bucket":          "awscc_s3_bucket",
+	"public_access_block_configuration": "public_access_block_configuration",
+	"block_public_acls":                 "block_public_acls",
+	"block_public_policy":               "block_public_policy",
+	"ignore_public_acls":                "ignore_public_acls",
+	"restrict_public_buckets":           "restrict_public_buckets",
+	"constant_value":                    "constant_value",
+}
+
+# Get all S3 bucket resources
+allS3Buckets = filter tfconfig.resources as address, r {
+	r.type is const.resource_awscc_s3_bucket
+}
+
+# Find violations - S3 buckets without Block Public Access settings enabled
+violations = []
+
+for allS3Buckets as address, bucket {
+	bucket_config = bucket.config
+
+	# Check if public_access_block_configuration is set
+	if bucket_config[const.public_access_block_configuration] else null is null {
+		append(violations, bucket)
+	} else {
+		public_access_block = bucket_config[const.public_access_block_configuration]
+
+		# Check if all Block Public Access settings are enabled
+		if public_access_block[const.block_public_acls] else null is null or
+			public_access_block[const.block_public_policy] else null is null or
+			public_access_block[const.ignore_public_acls] else null is null or
+			public_access_block[const.restrict_public_buckets] else null is null {
+			append(violations, bucket)
+		} else {
+			block_public_acls = public_access_block[const.block_public_acls][const.constant_value]
+			block_public_policy = public_access_block[const.block_public_policy][const.constant_value]
+			ignore_public_acls = public_access_block[const.ignore_public_acls][const.constant_value]
+			restrict_public_buckets = public_access_block[const.restrict_public_buckets][const.constant_value]
+
+			if block_public_acls is not true or
+				block_public_policy is not true or
+				ignore_public_acls is not true or
+				restrict_public_buckets is not true {
+				append(violations, bucket)
+			}
+		}
+	}
+}
+
+# Print violations for debugging
+if length(violations) > 0 {
+	print("S3 buckets without Block Public Access settings enabled:")
+	for violations as _, v {
+		print("  *", v.address)
+	}
+}
+
+# Rules
+main = rule {
+	length(violations) is 0
+}
